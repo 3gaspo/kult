@@ -1,0 +1,6 @@
+{
+  "name": "Kult",
+  "description": "A mobile-first personal database for cultural content to complete, such as books, movies, series, documentaries, and podcasts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

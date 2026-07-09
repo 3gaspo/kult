@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "ContentItem": {
+      "title": "ContentItem",
+      "description": "A cultural item to complete, such as a book, movie, etc.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "typeId": { "type": "string" },
+        "typeLabel": { "type": "string" },
+        "author": { "type": "string" },
+        "publishedDate": { "type": "string" },
+        "addedDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["to_complete", "ongoing", "completed"] },
+        "completedDate": { "type": "string" },
+        "note": { "type": "string" },
+        "keywords": { "type": "array" },
+        "priority": { "type": "integer" },
+        "pleasure": { "type": "integer" },
+        "length": { "type": "integer" },
+        "effectivePriority": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "typeId", "typeLabel", "addedDate", "status", "priority", "pleasure", "length", "effectivePriority", "createdAt", "updatedAt"]
+    },
+    "ContentType": {
+      "title": "ContentType",
+      "description": "A category/type of cultural content.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "order": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "label", "order", "createdAt", "updatedAt"]
+    },
+    "UserSettings": {
+      "title": "UserSettings",
+      "description": "User specific configurations and priorities.",
+      "type": "object",
+      "properties": {
+        "theme": { "type": "string", "enum": ["light", "dark"] },
+        "defaultTypeId": { "type": "string" },
+        "priorityWeight": { "type": "number" },
+        "pleasureWeight": { "type": "number" },
+        "shortnessWeight": { "type": "number" },
+        "freshnessWeight": { "type": "number" },
+        "backlogWeight": { "type": "number" },
+        "initialized": { "type": "boolean" }
+      },
+      "required": ["theme", "priorityWeight", "pleasureWeight", "shortnessWeight", "freshnessWeight", "backlogWeight", "initialized"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/content/{contentId}": {
+      "schema": "ContentItem",
+      "description": "User cultural content items"
+    },
+    "/users/{userId}/contentTypes/{typeId}": {
+      "schema": "ContentType",
+      "description": "User custom content types list"
+    },
+    "/users/{userId}/settings/main": {
+      "schema": "UserSettings",
+      "description": "User settings document"
+    }
+  }
+}

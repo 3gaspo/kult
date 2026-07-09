@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Open book icon">
+  <rect width="512" height="512" fill="#000"/>
+  <g fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 338V178"/>
+    <path d="M256 178C216 120 143 126 108 128c-7 .4-12 6-12 13v192c0 8 7 14 15 13 41-4 106-3 145 40"/>
+    <path d="M256 178c40-58 113-52 148-50 7 .4 12 6 12 13v192c0 8-7 14-15 13-41-4-106-3-145 40"/>
+    <path d="M96 164H76c-11 0-20 9-20 20v196c0 8 7 14 15 13 47-7 137-14 185 31"/>
+    <path d="M416 164h20c11 0 20 9 20 20v196c0 8-7 14-15 13-47-7-137-14-185 31"/>
+  </g>
+</svg>
