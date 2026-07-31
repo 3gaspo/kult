@@ -7,10 +7,10 @@ import React, { useState, useMemo } from "react";
 import { useKult } from "../providers";
 import { ContentItem } from "../types";
 import { ContentItemModal } from "../components/ContentItemModal";
-import { Search, ChevronDown, CheckCircle, Calendar, RefreshCcw, Edit3, Film, ArrowUpCircle } from "lucide-react";
+import { Search, ChevronDown, CheckCircle, Calendar, RefreshCcw, Edit3, Film, ArrowUpCircle, Flame } from "lucide-react";
 
 export const HistoryPage: React.FC = () => {
-  const { items, types, updateItem } = useKult();
+  const { items, types, settings, updateItem } = useKult();
 
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -205,6 +205,12 @@ export const HistoryPage: React.FC = () => {
                       <Calendar className="w-3 h-3" />
                       <span>Completed {item.completedDate}</span>
                     </span>
+                    {settings?.hideOverallScore === false && (
+                      <span className="text-xs font-bold text-black dark:text-white bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-md flex items-center gap-1">
+                        <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
+                        <span>EP {item.effectivePriority.toFixed(1)}</span>
+                      </span>
+                    )}
                   </div>
 
                   {/* Title and Author */}

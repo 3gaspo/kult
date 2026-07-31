@@ -5,10 +5,10 @@
 
 import React, { useState, useMemo } from "react";
 import { useKult } from "../providers";
-import { ChevronDown, BarChart3, TrendingUp, Inbox, CheckSquare, Activity } from "lucide-react";
+import { ChevronDown, BarChart3, TrendingUp, Inbox, CheckSquare, Activity, Flame } from "lucide-react";
 
 export const StatisticsPage: React.FC = () => {
-  const { items, types } = useKult();
+  const { items, types, settings } = useKult();
 
   // Filter States
   const [selectedTypeId, setSelectedTypeId] = useState<string>("all");
@@ -61,6 +61,12 @@ export const StatisticsPage: React.FC = () => {
 
   const ongoingCount = useMemo(() => {
     return items.filter((i) => i.status === "ongoing").length;
+  }, [items]);
+
+  const overallAvgScore = useMemo(() => {
+    if (items.length === 0) return "0.0";
+    const sum = items.reduce((acc, i) => acc + i.effectivePriority, 0);
+    return (sum / items.length).toFixed(1);
   }, [items]);
 
   // 1. Completed per category chart data (filtered by year)
@@ -336,6 +342,25 @@ export const StatisticsPage: React.FC = () => {
             </span>
           </div>
         </div>
+
+        {settings?.hideOverallScore === false && (
+          <div className="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col justify-between space-y-3 col-span-2">
+            <div className="w-8 h-8 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+              <Flame className="w-4 h-4 fill-rose-500 text-rose-500" />
+            </div>
+            <div>
+              <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 block">
+                Average EP Score
+              </span>
+              <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 block mt-1">
+                {overallAvgScore}
+              </span>
+              <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-1 block">
+                Across all backlog items
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Charts Section */}

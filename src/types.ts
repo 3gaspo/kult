@@ -41,6 +41,8 @@ export interface UserSettings {
   freshnessWeight: number;
   backlogWeight: number;
   initialized: boolean;
+  hideCategoryScore?: boolean; // Default: true (hidden by default)
+  hideOverallScore?: boolean;  // Default: true (hidden by default)
 }
 
 export interface AuthUser {

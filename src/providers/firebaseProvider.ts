@@ -171,6 +171,8 @@ export class FirestoreDataProvider implements IDataProvider {
         const defaultSettings: UserSettings = {
           theme: "light",
           defaultTypeId: "book",
+          hideCategoryScore: true,
+          hideOverallScore: true,
           ...DEFAULT_FORMULA_WEIGHTS,
           initialized: true,
         };
@@ -321,6 +323,8 @@ export class FirestoreDataProvider implements IDataProvider {
       return {
         theme: "light",
         defaultTypeId: "book",
+        hideCategoryScore: true,
+        hideOverallScore: true,
         ...DEFAULT_FORMULA_WEIGHTS,
         initialized: false,
       };
@@ -330,11 +334,22 @@ export class FirestoreDataProvider implements IDataProvider {
     try {
       const docSnap = await getDoc(doc(db, "users", userId, "settings", "main"));
       if (docSnap.exists()) {
-        return docSnap.data() as UserSettings;
+        const data = docSnap.data();
+        return {
+          theme: "light",
+          defaultTypeId: "book",
+          ...DEFAULT_FORMULA_WEIGHTS,
+          ...data,
+          hideCategoryScore: data.hideCategoryScore ?? true,
+          hideOverallScore: data.hideOverallScore ?? true,
+          initialized: true,
+        } as UserSettings;
       }
       return {
         theme: "light",
         defaultTypeId: "book",
+        hideCategoryScore: true,
+        hideOverallScore: true,
         ...DEFAULT_FORMULA_WEIGHTS,
         initialized: true,
       };

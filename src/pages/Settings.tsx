@@ -27,6 +27,7 @@ import {
   Eye,
   EyeOff,
   CircleAlert,
+  Flame,
 } from "lucide-react";
 
 // Constants requested by user
@@ -447,6 +448,88 @@ export const SettingsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Score Display Settings */}
+      {settings && (
+        <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200" id="settings-score-display">
+          <div>
+            <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+              Score Visibility
+            </span>
+            <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
+              Effective Priority & Rating Scores
+            </h2>
+          </div>
+
+          <div className="bg-white dark:bg-black/20 rounded-2xl border border-zinc-100 dark:border-zinc-900 overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-900 shadow-sm">
+            {/* Hide Score Per Category */}
+            <div className="p-5 flex justify-between items-center gap-4">
+              <div className="space-y-0.5 pr-2">
+                <div className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
+                  Hide score per category
+                </div>
+                <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Hide Effective Priority (EP) and rating scores on backlog items in category views.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const current = settings.hideCategoryScore ?? true;
+                  saveSettings({
+                    ...settings,
+                    hideCategoryScore: !current,
+                  });
+                }}
+                className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 focus:outline-none shrink-0 ${
+                  (settings.hideCategoryScore ?? true) ? "bg-black dark:bg-white" : "bg-zinc-200 dark:bg-zinc-800"
+                }`}
+                id="toggle-hide-category-score"
+                title="Toggle hide category score"
+              >
+                <div
+                  className={`w-6 h-6 rounded-full bg-white dark:bg-zinc-900 shadow-sm transition-transform duration-200 transform ${
+                    (settings.hideCategoryScore ?? true) ? "translate-x-6" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Hide Overall Score */}
+            <div className="p-5 flex justify-between items-center gap-4">
+              <div className="space-y-0.5 pr-2">
+                <div className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
+                  Hide overall score
+                </div>
+                <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Hide Effective Priority (EP) scores in history and overall statistics views.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const current = settings.hideOverallScore ?? true;
+                  saveSettings({
+                    ...settings,
+                    hideOverallScore: !current,
+                  });
+                }}
+                className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 focus:outline-none shrink-0 ${
+                  (settings.hideOverallScore ?? true) ? "bg-black dark:bg-white" : "bg-zinc-200 dark:bg-zinc-800"
+                }`}
+                id="toggle-hide-overall-score"
+                title="Toggle hide overall score"
+              >
+                <div
+                  className={`w-6 h-6 rounded-full bg-white dark:bg-zinc-900 shadow-sm transition-transform duration-200 transform ${
+                    (settings.hideOverallScore ?? true) ? "translate-x-6" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 2. Appearance */}
       {settings && (

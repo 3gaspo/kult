@@ -227,11 +227,22 @@ export class LocalDataProvider implements IDataProvider {
     this.seedIfNeeded(userId);
     const data = localStorage.getItem(KEY_SETTINGS(userId));
     if (data) {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      return {
+        theme: "light",
+        defaultTypeId: "book",
+        ...DEFAULT_FORMULA_WEIGHTS,
+        ...parsed,
+        hideCategoryScore: parsed.hideCategoryScore ?? true,
+        hideOverallScore: parsed.hideOverallScore ?? true,
+        initialized: true,
+      };
     }
     const defaultSettings: UserSettings = {
       theme: "light",
       defaultTypeId: "book",
+      hideCategoryScore: true,
+      hideOverallScore: true,
       ...DEFAULT_FORMULA_WEIGHTS,
       initialized: true,
     };

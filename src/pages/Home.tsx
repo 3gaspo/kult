@@ -43,6 +43,14 @@ export const HomePage: React.FC = () => {
     return types.find((t) => t.id === selectedTypeId)?.label || "";
   }, [types, selectedTypeId]);
 
+  const isCategoryScoreHidden = settings?.hideCategoryScore !== false;
+
+  const categoryAvgScore = useMemo(() => {
+    if (filteredItems.length === 0) return "0.0";
+    const sum = filteredItems.reduce((acc, i) => acc + i.effectivePriority, 0);
+    return (sum / filteredItems.length).toFixed(1);
+  }, [filteredItems]);
+
   // Fast Status Toggles
   const handleMarkCompleted = async (itemId: string) => {
     await updateItem(itemId, {
@@ -114,6 +122,12 @@ export const HomePage: React.FC = () => {
           <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
             {selectedTypeLabel || "Cultural Items"} — {filteredItems.length} Backlog
           </span>
+          {!isCategoryScoreHidden && filteredItems.length > 0 && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full">
+              <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
+              Avg EP {categoryAvgScore}
+            </span>
+          )}
         </div>
 
         {filteredItems.length === 0 ? (
@@ -169,26 +183,30 @@ export const HomePage: React.FC = () => {
                     {/* Metadata indicators */}
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
                       {/* Effective priority score */}
-                      <div className="flex items-center gap-1 text-black dark:text-white bg-black/5 dark:bg-white/5 px-2 py-1 rounded-lg">
-                        <Flame className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
-                        <span>EP {item.effectivePriority.toFixed(1)}</span>
-                      </div>
+                      {!isCategoryScoreHidden && (
+                        <div className="flex items-center gap-1 text-black dark:text-white bg-black/5 dark:bg-white/5 px-2 py-1 rounded-lg">
+                          <Flame className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
+                          <span>EP {item.effectivePriority.toFixed(1)}</span>
+                        </div>
+                      )}
 
                       {/* Detail metrics */}
-                      <div className="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-900/60 px-2 py-1 rounded-lg border border-zinc-100 dark:border-zinc-800">
-                        <div className="flex items-center gap-0.5" title="Priority">
-                          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                          <span className="text-[10px]">{item.priority}</span>
+                      {!isCategoryScoreHidden && (
+                        <div className="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-900/60 px-2 py-1 rounded-lg border border-zinc-100 dark:border-zinc-800">
+                          <div className="flex items-center gap-0.5" title="Priority">
+                            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                            <span className="text-[10px]">{item.priority}</span>
+                          </div>
+                          <div className="flex items-center gap-0.5" title="Motivation">
+                            <Heart className="w-3 h-3 text-rose-500 fill-rose-500" />
+                            <span className="text-[10px]">{item.pleasure}</span>
+                          </div>
+                          <div className="flex items-center gap-0.5" title="Length">
+                            <Hourglass className="w-3 h-3 text-indigo-500" />
+                            <span className="text-[10px]">{item.length}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-0.5" title="Motivation">
-                          <Heart className="w-3 h-3 text-rose-500 fill-rose-500" />
-                          <span className="text-[10px]">{item.pleasure}</span>
-                        </div>
-                        <div className="flex items-center gap-0.5" title="Length">
-                          <Hourglass className="w-3 h-3 text-indigo-500" />
-                          <span className="text-[10px]">{item.length}</span>
-                        </div>
-                      </div>
+                      )}
 
                       {/* Date indicator */}
                       <div className="flex items-center gap-1 font-medium text-zinc-400">
