@@ -32,7 +32,7 @@ import {
 
 // Constants requested by user
 const SUPPORT_URL = "https://ko-fi.com/3gaspo";
-const APP_VERSION = "0.0.0"; // Corresponds to package.json version
+const APP_VERSION = "0.0.1"; // Corresponds to package.json version
 
 export const SettingsPage: React.FC = () => {
   const {

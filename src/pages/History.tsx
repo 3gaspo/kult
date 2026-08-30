@@ -19,6 +19,19 @@ export const HistoryPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+  // Close active dropdown menu when clicking anywhere else
+  React.useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".reopen-menu-container")) {
+        setActiveMenuId(null);
+      }
+    };
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, []);
 
   // Get completed items only
   const completedItems = useMemo(() => {
@@ -189,100 +202,120 @@ export const HistoryPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4" id="history-items-list">
-            {filteredCompletedItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white dark:bg-black/20 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-900 flex justify-between items-start gap-4 transition-all"
-                id={`completed-card-${item.id}`}
-              >
-                <div className="space-y-2 pr-12">
-                  {/* Category Pill and Date */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
-                      {item.typeLabel}
-                    </span>
-                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 rounded-md">
-                      <Calendar className="w-3 h-3" />
-                      <span>Completed {item.completedDate}</span>
-                    </span>
-                    {settings?.hideOverallScore === false && (
-                      <span className="text-xs font-bold text-black dark:text-white bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
-                        <span>EP {item.effectivePriority.toFixed(1)}</span>
+            {filteredCompletedItems.map((item) => {
+              const isMenuOpen = activeMenuId === item.id;
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white dark:bg-black/20 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
+                  id={`completed-card-${item.id}`}
+                >
+                  <div className="flex-1 min-w-0 space-y-2">
+                    {/* Category Pill and Date */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+                        {item.typeLabel}
                       </span>
-                    )}
-                  </div>
+                      <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 rounded-md">
+                        <Calendar className="w-3 h-3" />
+                        <span>Completed {item.completedDate}</span>
+                      </span>
+                      {settings?.hideOverallScore === false && (
+                        <span className="text-xs font-bold text-black dark:text-white bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
+                          <span>EP {item.effectivePriority.toFixed(1)}</span>
+                        </span>
+                      )}
+                    </div>
 
-                  {/* Title and Author */}
-                  <div>
-                    <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-50 leading-tight">
-                      {item.title}
-                    </h3>
-                    {item.author && (
-                      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                        by {item.author}
+                    {/* Title and Author */}
+                    <div>
+                      <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-50 leading-tight">
+                        {item.title}
+                      </h3>
+                      {item.author && (
+                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                          by {item.author}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Keywords */}
+                    {item.keywords && item.keywords.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {item.keywords.map((word, i) => (
+                          <span
+                            key={i}
+                            className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500"
+                          >
+                            #{word}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {item.note && (
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500 italic bg-zinc-50/50 dark:bg-zinc-900/30 p-2.5 rounded-xl border border-dashed border-zinc-100 dark:border-zinc-800 line-clamp-2">
+                        "{item.note}"
                       </p>
                     )}
                   </div>
 
-                  {/* Keywords */}
-                  {item.keywords && item.keywords.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {item.keywords.map((word, i) => (
-                        <span
-                          key={i}
-                          className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500"
-                        >
-                          #{word}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Notes */}
-                  {item.note && (
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500 italic bg-zinc-50/50 dark:bg-zinc-900/30 p-2.5 rounded-xl border border-dashed border-zinc-100 dark:border-zinc-800 line-clamp-2">
-                      "{item.note}"
-                    </p>
-                  )}
-                </div>
-
-                {/* Quick actions on Right */}
-                <div className="flex flex-col gap-2 shrink-0">
-                  <button
-                    onClick={() => handleEditClick(item)}
-                    className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-all active:scale-90"
-                    title="Edit Item details"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-
-                  <div className="group relative">
+                  {/* Quick actions on Right */}
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                     <button
+                      onClick={() => handleEditClick(item)}
                       className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-all active:scale-90"
-                      title="Move back / Reopen"
+                      title="Edit Item details"
                     >
-                      <RefreshCcw className="w-4 h-4" />
+                      <Edit3 className="w-4 h-4" />
                     </button>
-                    {/* Floating dropdown options for reopening */}
-                    <div className="absolute right-0 top-11 bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 py-1.5 z-10 hidden group-hover:block hover:block w-36 overflow-hidden">
+
+                    <div className="relative reopen-menu-container">
                       <button
-                        onClick={() => handleReopenItem(item.id, "to_complete")}
-                        className="w-full px-4 py-2 text-left text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveMenuId(isMenuOpen ? null : item.id);
+                        }}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90 ${
+                          isMenuOpen
+                            ? "bg-black text-white dark:bg-white dark:text-black"
+                            : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
+                        }`}
+                        title="Move back / Reopen"
                       >
-                        Reopen to Backlog
+                        <RefreshCcw className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleReopenItem(item.id, "ongoing")}
-                        className="w-full px-4 py-2 text-left text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                      >
-                        Reopen to Ongoing
-                      </button>
+
+                      {/* Dropdown options for reopening */}
+                      {isMenuOpen && (
+                        <div className="absolute right-0 bottom-12 sm:bottom-auto sm:top-12 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 py-1.5 z-30 w-44 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                          <button
+                            onClick={() => {
+                              handleReopenItem(item.id, "to_complete");
+                              setActiveMenuId(null);
+                            }}
+                            className="w-full px-4 py-2.5 text-left text-xs font-bold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                          >
+                            Reopen to Backlog
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleReopenItem(item.id, "ongoing");
+                              setActiveMenuId(null);
+                            }}
+                            className="w-full px-4 py-2.5 text-left text-xs font-bold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                          >
+                            Reopen to Ongoing
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

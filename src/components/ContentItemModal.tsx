@@ -61,8 +61,10 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
         setLength(itemToEdit.length || 3);
       } else {
         setTitle("");
-        // Set default type from settings or first available type
-        const defaultType = settings?.defaultTypeId || (types.length > 0 ? types[0].id : "");
+        // Set default type from settings (if it exists) or first available type
+        const defaultType = (settings?.defaultTypeId && types.some((t) => t.id === settings.defaultTypeId))
+          ? settings.defaultTypeId
+          : (types.length > 0 ? types[0].id : "");
         setTypeId(defaultType);
         setAuthor("");
         setPublishedDate("");

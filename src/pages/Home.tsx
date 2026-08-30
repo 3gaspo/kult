@@ -152,14 +152,14 @@ export const HomePage: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className={`bg-white dark:bg-black/20 p-5 rounded-2xl border transition-all relative ${
+                  className={`bg-white dark:bg-black/20 p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                     isOngoing
                       ? "border-amber-500/50 dark:border-amber-500/30 ring-2 ring-amber-500/10"
                       : "border-zinc-100 dark:border-zinc-900"
                   }`}
                   id={`item-card-${item.id}`}
                 >
-                  <div className="space-y-3 pr-20">
+                  <div className="flex-1 min-w-0 space-y-3">
                     {/* Title and Author */}
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
@@ -237,8 +237,8 @@ export const HomePage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Actions Column on the Right */}
-                  <div className="absolute right-4 bottom-4 flex flex-col gap-2 shrink-0">
+                  {/* Actions Row on the Right */}
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                     <button
                       onClick={() => handleEditItemClick(item)}
                       className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-all active:scale-90"
@@ -248,40 +248,30 @@ export const HomePage: React.FC = () => {
                     </button>
 
                     {isOngoing ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleMarkToComplete(item.id)}
-                          className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-all active:scale-90"
-                          title="Pause / Set to backlog"
-                        >
-                          <Bookmark className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleMarkCompleted(item.id)}
-                          className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-black flex items-center justify-center transition-all active:scale-90"
-                          title="Mark completed"
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleMarkToComplete(item.id)}
+                        className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-all active:scale-90"
+                        title="Pause / Set to backlog"
+                      >
+                        <Bookmark className="w-4 h-4" />
+                      </button>
                     ) : (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleMarkOngoing(item.id)}
-                          className="w-10 h-10 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center transition-all active:scale-90"
-                          title="Start completing"
-                        >
-                          <Play className="w-4 h-4 fill-current ml-0.5" />
-                        </button>
-                        <button
-                          onClick={() => handleMarkCompleted(item.id)}
-                          className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-black flex items-center justify-center transition-all active:scale-90"
-                          title="Mark completed"
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleMarkOngoing(item.id)}
+                        className="w-10 h-10 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center transition-all active:scale-90"
+                        title="Start completing"
+                      >
+                        <Play className="w-4 h-4 fill-current ml-0.5" />
+                      </button>
                     )}
+
+                    <button
+                      onClick={() => handleMarkCompleted(item.id)}
+                      className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-black flex items-center justify-center transition-all active:scale-90"
+                      title="Mark completed"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               );
