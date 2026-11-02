@@ -1,3 +1,7 @@
+import { formatDate, formatNumber } from '@3gaspo/app-ui/formats';
+import { SearchField } from '../components/SearchField';
+import { ActionMenu } from '../components/ActionMenu';
+import { StateFeedback } from '../components/StateFeedback';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -19,19 +23,6 @@ export const HistoryPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
-  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
-
-  // Close active dropdown menu when clicking anywhere else
-  React.useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".reopen-menu-container")) {
-        setActiveMenuId(null);
-      }
-    };
-    window.addEventListener("click", handleOutsideClick);
-    return () => window.removeEventListener("click", handleOutsideClick);
-  }, []);
 
   // Get completed items only
   const completedItems = useMemo(() => {
@@ -115,38 +106,26 @@ export const HistoryPage: React.FC = () => {
     <div className="space-y-6 pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50" id="history-title">
+        <h1 className="text-4xl font-bold tracking-tight text-ui-text" id="history-title">
           History
         </h1>
       </div>
 
       {/* Filter and Search Box */}
-      <div className="bg-black/5 dark:bg-white/5 p-6 rounded-[32px] space-y-4 transition-colors duration-200">
+      <div className="ui-section-card bg-ui-section p-6 rounded-[32px] space-y-4 transition-colors duration-200">
         {/* Search Field */}
-        <div className="relative flex items-center">
-          <span className="absolute left-4 text-zinc-400 dark:text-zinc-500">
-            <Search className="w-5 h-5" />
-          </span>
-          <input
-            type="text"
-            placeholder="Search completed items, creators, keywords..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm font-medium shadow-sm"
-            id="history-search-input"
-          />
-        </div>
+        <SearchField label="Search completed items, creators and keywords" value={searchQuery} onChange={setSearchQuery} id="history-search-input" />
 
         {/* Dropdowns Row */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="ui-filter-grid grid grid-cols-2 gap-4">
           {/* Category Dropdown */}
           <div className="space-y-1">
             <div className="relative">
               <select
                 value={selectedTypeId}
                 onChange={(e) => setSelectedTypeId(e.target.value)}
-                className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
-                id="history-type-filter"
+                className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
+                aria-label="Category" id="history-type-filter"
               >
                 <option value="all">All Categories</option>
                 {types.map((t) => (
@@ -155,7 +134,7 @@ export const HistoryPage: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
                 <ChevronDown className="w-4 h-4" />
               </span>
             </div>
@@ -167,8 +146,8 @@ export const HistoryPage: React.FC = () => {
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
-                className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
-                id="history-year-filter"
+                className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
+                aria-label="Year" id="history-year-filter"
               >
                 <option value="all">All Years</option>
                 {years.map((yr) => (
@@ -177,7 +156,7 @@ export const HistoryPage: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
                 <ChevronDown className="w-4 h-4" />
               </span>
             </div>
@@ -186,55 +165,47 @@ export const HistoryPage: React.FC = () => {
       </div>
 
       {/* History List */}
-      <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] transition-colors duration-200">
-        <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 mb-6 block">
+      <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] transition-colors duration-200">
+        <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted mb-6 block">
           Completed Items — {filteredCompletedItems.length} entries
         </span>
 
         {filteredCompletedItems.length === 0 ? (
-          <div className="text-center py-12 space-y-4" id="history-empty-state">
-            <div className="mx-auto w-16 h-16 rounded-full bg-white dark:bg-zinc-900/60 flex items-center justify-center text-zinc-300 dark:text-zinc-700">
-              <CheckCircle className="w-8 h-8" />
-            </div>
-            <p className="text-zinc-500 dark:text-zinc-400 font-medium text-base">
-              No completed items match the selected criteria.
-            </p>
-          </div>
+          <div id="history-empty-state"><StateFeedback title="No completed items" /></div>
         ) : (
           <div className="space-y-4" id="history-items-list">
             {filteredCompletedItems.map((item) => {
-              const isMenuOpen = activeMenuId === item.id;
               return (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-black/20 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
+                  className="ui-item-card bg-ui-surface p-5 rounded-2xl border border-ui-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
                   id={`completed-card-${item.id}`}
                 >
                   <div className="flex-1 min-w-0 space-y-2">
                     {/* Category Pill and Date */}
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+                      <span className="ui-section-title text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-ui-section text-ui-muted">
                         {item.typeLabel}
                       </span>
                       <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-0.5 rounded-md">
                         <Calendar className="w-3 h-3" />
-                        <span>Completed {item.completedDate}</span>
+                        <span>Completed {formatDate(item.completedDate || '')}</span>
                       </span>
                       {settings?.hideOverallScore === false && (
-                        <span className="text-xs font-bold text-black dark:text-white bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-md flex items-center gap-1">
+                        <span className="text-xs font-bold text-ui-ink bg-ui-section px-2 py-0.5 rounded-md flex items-center gap-1">
                           <Flame className="w-3 h-3 fill-rose-500 text-rose-500" />
-                          <span>EP {item.effectivePriority.toFixed(1)}</span>
+                          <span>EP {formatNumber(item.effectivePriority, 1)}</span>
                         </span>
                       )}
                     </div>
 
                     {/* Title and Author */}
                     <div>
-                      <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-50 leading-tight">
+                      <h3 className="ui-item-title font-bold text-lg text-ui-text leading-tight">
                         {item.title}
                       </h3>
                       {item.author && (
-                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                        <p className="ui-meta text-sm font-medium text-ui-muted">
                           by {item.author}
                         </p>
                       )}
@@ -246,7 +217,7 @@ export const HistoryPage: React.FC = () => {
                         {item.keywords.map((word, i) => (
                           <span
                             key={i}
-                            className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500"
+                            className="ui-meta text-[10px] font-bold text-ui-muted"
                           >
                             #{word}
                           </span>
@@ -256,7 +227,7 @@ export const HistoryPage: React.FC = () => {
 
                     {/* Notes */}
                     {item.note && (
-                      <p className="text-xs text-zinc-400 dark:text-zinc-500 italic bg-zinc-50/50 dark:bg-zinc-900/30 p-2.5 rounded-xl border border-dashed border-zinc-100 dark:border-zinc-800 line-clamp-2">
+                      <p className="ui-meta text-xs text-ui-muted italic bg-ui-section p-2.5 rounded-xl border border-dashed border-ui-border line-clamp-2">
                         "{item.note}"
                       </p>
                     )}
@@ -266,52 +237,16 @@ export const HistoryPage: React.FC = () => {
                   <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                     <button
                       onClick={() => handleEditClick(item)}
-                      className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-all active:scale-90"
-                      title="Edit Item details"
+                      className="ui-icon-button w-10 h-10 rounded-full bg-ui-section hover:bg-ui-ink/10 text-ui-ink/60 flex items-center justify-center transition-all "
+                      title="Edit content"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
 
-                    <div className="relative reopen-menu-container">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveMenuId(isMenuOpen ? null : item.id);
-                        }}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90 ${
-                          isMenuOpen
-                            ? "bg-black text-white dark:bg-white dark:text-black"
-                            : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
-                        }`}
-                        title="Move back / Reopen"
-                      >
-                        <RefreshCcw className="w-4 h-4" />
-                      </button>
-
-                      {/* Dropdown options for reopening */}
-                      {isMenuOpen && (
-                        <div className="absolute right-0 bottom-12 sm:bottom-auto sm:top-12 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 py-1.5 z-30 w-44 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                          <button
-                            onClick={() => {
-                              handleReopenItem(item.id, "to_complete");
-                              setActiveMenuId(null);
-                            }}
-                            className="w-full px-4 py-2.5 text-left text-xs font-bold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                          >
-                            Reopen to Backlog
-                          </button>
-                          <button
-                            onClick={() => {
-                              handleReopenItem(item.id, "ongoing");
-                              setActiveMenuId(null);
-                            }}
-                            className="w-full px-4 py-2.5 text-left text-xs font-bold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                          >
-                            Reopen to Ongoing
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    <ActionMenu label="Reopen content" icon={<RefreshCcw size={20} />} items={[
+                      { label: 'Backlog', onSelect: () => handleReopenItem(item.id, 'to_complete') },
+                      { label: 'Ongoing', onSelect: () => handleReopenItem(item.id, 'ongoing') },
+                    ]} />
                   </div>
                 </div>
               );

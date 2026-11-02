@@ -1,9 +1,13 @@
+import { ValidatedForm } from '../components/ValidatedForm';
+import { SettingsSwitch } from '../components/SettingsSwitch';
+import { PageHeader } from '../components/PageHeader';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import React, { useState, useMemo } from "react";
+import { Dialog, DialogActions } from '../components/Dialog';
 import { useKult } from "../providers";
 import { ContentType, UserSettings, DEFAULT_FORMULA_WEIGHTS } from "../types";
 import {
@@ -281,84 +285,72 @@ export const SettingsPage: React.FC = () => {
   }, [settings]);
 
   return (
-    <div className="space-y-8 pb-24 text-zinc-900 dark:text-zinc-50 font-sans">
+    <div className="space-y-6 pb-24 text-ui-text font-sans">
       {/* Header */}
-      <div className="flex justify-between items-baseline">
-        <h1 className="text-4xl font-bold tracking-tight" id="settings-title">
-          Settings
-        </h1>
-        {!isFirebase && (
-          <span className="text-emerald-500 font-extrabold tracking-widest text-[10px] bg-emerald-500/10 dark:bg-emerald-500/20 px-3 py-1.5 rounded-full" id="dev-mode-badge">
-            DEV MODE
-          </span>
-        )}
-      </div>
+      <PageHeader title="Settings" devMode={!isFirebase} titleId="settings-title" devModeId="dev-mode-badge" />
 
       {/* 1. App-specific settings */}
       <div className="space-y-6">
         
         {/* Content Types section */}
-        <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
+        <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
           <div>
-            <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+            <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
               Content Types
             </span>
-            <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
-              Customize categories
-            </h2>
           </div>
 
           {/* Add Category Form */}
-          <form onSubmit={handleAddType} className="flex gap-2">
+          <ValidatedForm onSubmit={handleAddType} className="flex gap-2">
             <input
               type="text"
               placeholder="e.g. Manga, Novel, Boardgame"
               value={newTypeLabel}
               onChange={(e) => setNewTypeLabel(e.target.value)}
-              className="flex-1 px-4 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm font-semibold shadow-sm"
+              className="ui-field flex-1 min-w-0 px-4 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm font-semibold shadow-sm"
               id="settings-add-type-input"
             />
-            <button
+            <button aria-label="Add"
               type="submit"
-              className="w-12 h-12 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shadow-md shrink-0"
+              className="ui-icon-button w-12 h-12 rounded-2xl bg-ui-primary text-ui-primary-text flex items-center justify-center hover:opacity-90 transition-all shadow-md shrink-0"
               id="settings-add-type-btn"
             >
               <Plus className="w-5 h-5 stroke-[3]" />
             </button>
-          </form>
+          </ValidatedForm>
 
           {typeError && (
-            <p className="text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-500/10 px-3.5 py-2 rounded-xl">
+            <p role="alert" className="ui-error text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-500/10 px-3.5 py-2 rounded-xl">
               {typeError}
             </p>
           )}
 
           {/* Categories List */}
-          <div className="bg-white dark:bg-black/20 rounded-2xl border border-zinc-100 dark:border-zinc-900 overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-900 shadow-sm" id="types-list">
+          <div className="bg-ui-surface rounded-2xl border border-ui-border overflow-hidden divide-y divide-ui-border shadow-sm" id="types-list">
             {types.map((t, idx) => (
-              <div key={t.id} className="p-4 flex justify-between items-center gap-4 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                <span>{t.label}</span>
-                <div className="flex items-center gap-1 shrink-0">
+              <div key={t.id} className="ui-setting-list-row text-sm font-semibold text-ui-text">
+                <span title={t.label} className="ui-setting-list-name">{t.label}</span>
+                <div className="ui-setting-list-actions">
                   {/* Reorder controls */}
-                  <button
+                  <button aria-label="Move up"
                     onClick={() => handleMoveType(idx, "up")}
                     disabled={idx === 0}
-                    className="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-900/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 disabled:opacity-30 transition-all"
+                    className="ui-icon-button ui-row-action bg-ui-section hover:bg-ui-ink/10 text-ui-ink/40 disabled:opacity-30 transition-all"
                   >
                     <ArrowUp className="w-4 h-4" />
                   </button>
-                  <button
+                  <button aria-label="Move down"
                     onClick={() => handleMoveType(idx, "down")}
                     disabled={idx === types.length - 1}
-                    className="w-8 h-8 rounded-lg bg-zinc-50 dark:bg-zinc-900/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 disabled:opacity-30 transition-all"
+                    className="ui-icon-button ui-row-action bg-ui-section hover:bg-ui-ink/10 text-ui-ink/40 disabled:opacity-30 transition-all"
                   >
                     <ArrowDown className="w-4 h-4" />
                   </button>
                   {/* Delete category */}
-                  <button
+                  <button aria-label="Delete"
                     onClick={() => triggerDeleteType(t)}
                     disabled={types.length <= 1}
-                    className="w-8 h-8 rounded-lg bg-zinc-50 hover:bg-rose-50 text-zinc-500 hover:text-rose-600 dark:bg-zinc-900/80 dark:hover:bg-rose-950/20 dark:hover:text-rose-400 flex items-center justify-center transition-all disabled:opacity-30"
+                    className="ui-icon-button ui-row-action bg-zinc-50 hover:bg-rose-50 text-ui-ink/40 hover:text-rose-600 dark:bg-zinc-900/80 dark:hover:bg-rose-950/20 dark:hover:text-rose-400 flex items-center justify-center transition-all disabled:opacity-30"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -369,17 +361,14 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Priority Formula section */}
-        <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
+        <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
           <div>
-            <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+            <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
               Priority Formula
             </span>
-            <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
-              Adjust weights (total = 1.0)
-            </h2>
           </div>
 
-          <div className="bg-white dark:bg-black/20 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-900 space-y-4 shadow-sm text-sm font-semibold">
+          <div className="ui-setting-fields ui-item-card bg-ui-surface rounded-2xl border border-ui-border space-y-4 text-sm font-semibold">
             {/* Weight Inputs */}
             {[
               { label: "Priority weight", field: "priority" as const, val: priorityW, set: setPriorityW },
@@ -388,8 +377,8 @@ export const SettingsPage: React.FC = () => {
               { label: "Freshness weight", field: "freshness" as const, val: freshnessW, set: setFreshnessW },
               { label: "Backlog weight", field: "backlog" as const, val: backlogW, set: setBacklogW },
             ].map((f, i) => (
-              <div key={i} className="flex justify-between items-center gap-4">
-                <span className="text-zinc-700 dark:text-zinc-300">{f.label}</span>
+              <div key={i} className="ui-setting-row flex justify-between items-center gap-4">
+                <span className="text-ui-ink/70">{f.label}</span>
                 <input
                   type="text"
                   value={f.val}
@@ -397,14 +386,14 @@ export const SettingsPage: React.FC = () => {
                     f.set(e.target.value);
                     handleUpdateFormula(f.field, e.target.value);
                   }}
-                  className="w-20 px-3 py-1.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-right text-zinc-950 dark:text-zinc-50 font-bold focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
+                  className="ui-field w-20 px-3 py-1.5 rounded-xl bg-ui-section border border-ui-border text-right text-ui-text font-bold focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
                 />
               </div>
             ))}
 
             {/* Weights total info */}
-            <div className="pt-3 border-t border-zinc-100 dark:border-zinc-900 flex justify-between text-xs text-zinc-400 font-bold">
-              <span>Total sum weight</span>
+            <div className="ui-meta pt-3 border-t border-ui-border flex justify-between text-xs text-ui-ink/40 font-bold">
+              <span>Total (1.0)</span>
               <span className={
                 Math.abs((parseFloat(priorityW) || 0) + (parseFloat(pleasureW) || 0) + (parseFloat(shortnessW) || 0) + (parseFloat(freshnessW) || 0) + (parseFloat(backlogW) || 0) - 1.0) < 0.001
                   ? "text-emerald-500"
@@ -418,21 +407,18 @@ export const SettingsPage: React.FC = () => {
 
         {/* Defaults section */}
         {settings && types.length > 0 && (
-          <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
+          <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
             <div>
-              <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
-                Defaults
+              <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
+                Default category
               </span>
-              <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
-                Preferred startup category
-              </h2>
             </div>
 
             <div className="relative">
               <select
-                value={settings.defaultTypeId || ""}
+                aria-label="Default category" value={settings.defaultTypeId || ""}
                 onChange={(e) => saveSettings({ ...settings, defaultTypeId: e.target.value })}
-                className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
+                className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
                 id="settings-default-type-select"
               >
                 {types.map((t) => (
@@ -441,7 +427,7 @@ export const SettingsPage: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
                 <ChevronDown className="w-5 h-5" />
               </span>
             </div>
@@ -451,81 +437,44 @@ export const SettingsPage: React.FC = () => {
 
       {/* Score Display Settings */}
       {settings && (
-        <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200" id="settings-score-display">
+        <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200" id="settings-score-display">
           <div>
-            <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+            <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
               Score Visibility
             </span>
-            <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
-              Effective Priority & Rating Scores
-            </h2>
           </div>
 
-          <div className="bg-white dark:bg-black/20 rounded-2xl border border-zinc-100 dark:border-zinc-900 overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-900 shadow-sm">
+          <div className="bg-ui-surface rounded-2xl border border-ui-border overflow-hidden divide-y divide-ui-border shadow-sm">
             {/* Hide Score Per Category */}
-            <div className="p-5 flex justify-between items-center gap-4">
+            <div className="ui-setting-row p-5 flex justify-between items-center gap-4">
               <div className="space-y-0.5 pr-2">
-                <div className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
+                <div className="font-bold text-sm text-ui-text">
                   Hide score per category
                 </div>
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Hide Effective Priority (EP) and rating scores on backlog items in category views.
-                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
+              <SettingsSwitch checked={settings.hideCategoryScore ?? true} onClick={() => {
                   const current = settings.hideCategoryScore ?? true;
                   saveSettings({
                     ...settings,
                     hideCategoryScore: !current,
                   });
-                }}
-                className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 focus:outline-none shrink-0 ${
-                  (settings.hideCategoryScore ?? true) ? "bg-black dark:bg-white" : "bg-zinc-200 dark:bg-zinc-800"
-                }`}
-                id="toggle-hide-category-score"
-                title="Toggle hide category score"
-              >
-                <div
-                  className={`w-6 h-6 rounded-full bg-white dark:bg-zinc-900 shadow-sm transition-transform duration-200 transform ${
-                    (settings.hideCategoryScore ?? true) ? "translate-x-6" : "translate-x-0"
-                  }`}
-                />
-              </button>
+                }} label="Hide score per category" id="toggle-hide-category-score" />
             </div>
 
             {/* Hide Overall Score */}
-            <div className="p-5 flex justify-between items-center gap-4">
+            <div className="ui-setting-row p-5 flex justify-between items-center gap-4">
               <div className="space-y-0.5 pr-2">
-                <div className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
+                <div className="font-bold text-sm text-ui-text">
                   Hide overall score
                 </div>
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Hide Effective Priority (EP) scores in history and overall statistics views.
-                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
+              <SettingsSwitch checked={settings.hideOverallScore ?? true} onClick={() => {
                   const current = settings.hideOverallScore ?? true;
                   saveSettings({
                     ...settings,
                     hideOverallScore: !current,
                   });
-                }}
-                className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 focus:outline-none shrink-0 ${
-                  (settings.hideOverallScore ?? true) ? "bg-black dark:bg-white" : "bg-zinc-200 dark:bg-zinc-800"
-                }`}
-                id="toggle-hide-overall-score"
-                title="Toggle hide overall score"
-              >
-                <div
-                  className={`w-6 h-6 rounded-full bg-white dark:bg-zinc-900 shadow-sm transition-transform duration-200 transform ${
-                    (settings.hideOverallScore ?? true) ? "translate-x-6" : "translate-x-0"
-                  }`}
-                />
-              </button>
+                }} label="Hide overall score" id="toggle-hide-overall-score" />
             </div>
           </div>
         </div>
@@ -533,33 +482,16 @@ export const SettingsPage: React.FC = () => {
 
       {/* 2. Appearance */}
       {settings && (
-        <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200" id="settings-appearance">
+        <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200" id="settings-appearance">
           <div>
-            <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+            <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
               Appearance
             </span>
-            <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
-              Visual Theme
-            </h2>
           </div>
 
-          <div className="flex justify-between items-center bg-white dark:bg-black/20 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-900 shadow-sm font-bold text-sm">
-            <span className="text-zinc-700 dark:text-zinc-300">Dark Mode</span>
-            <button
-              onClick={() => saveSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" })}
-              className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 focus:outline-none ${
-                settings.theme === "dark" ? "bg-white text-black" : "bg-zinc-200 text-zinc-400"
-              }`}
-              id="theme-toggle-switch"
-            >
-              <div
-                className={`w-6 h-6 rounded-full bg-black dark:bg-zinc-900 flex items-center justify-center transition-transform duration-200 transform ${
-                  settings.theme === "dark" ? "translate-x-6" : "translate-x-0"
-                }`}
-              >
-                {settings.theme === "dark" ? <Moon className="w-3.5 h-3.5 text-white" /> : <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
-              </div>
-            </button>
+          <div className="ui-setting-row ui-item-card flex justify-between items-center bg-ui-surface p-5 rounded-2xl border border-ui-border shadow-sm font-bold text-sm">
+            <span className="text-ui-ink/70">Dark Mode</span>
+            <SettingsSwitch checked={settings.theme === "dark"} onClick={() => saveSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" })} label="Dark Mode" id="theme-toggle-switch" />
           </div>
         </div>
       )}
@@ -568,20 +500,20 @@ export const SettingsPage: React.FC = () => {
       <div id="settings-account">
         {!user ? (
           /* Signed Out card */
-          <div className="bg-black/5 dark:bg-white/5 p-8 rounded-[32px] space-y-6 transition-colors duration-200">
+          <div className="ui-section-card bg-ui-section p-8 rounded-[32px] space-y-6 transition-colors duration-200">
             <div>
-              <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+              <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
                 Account
               </span>
-              <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
+              <h2 className="text-xl font-bold tracking-tight text-ui-text mt-1">
                 Sign in or Create account
               </h2>
             </div>
 
-            <form onSubmit={handleAuthSubmit} className="space-y-4">
+            <ValidatedForm onSubmit={handleAuthSubmit} className="space-y-4">
               {/* Email */}
               <div className="relative flex items-center">
-                <span className="absolute left-4 text-zinc-400">
+                <span className="absolute left-4 text-ui-ink/40">
                   <Mail className="w-5 h-5" />
                 </span>
                 <input
@@ -589,13 +521,13 @@ export const SettingsPage: React.FC = () => {
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm font-semibold shadow-sm"
+                  className="ui-field ui-field-leading w-full pl-12 pr-4 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm font-semibold shadow-sm"
                 />
               </div>
 
               {/* Password */}
               <div className="relative flex items-center">
-                <span className="absolute left-4 text-zinc-400">
+                <span className="absolute left-4 text-ui-ink/40">
                   <Lock className="w-5 h-5" />
                 </span>
                 <input
@@ -603,19 +535,19 @@ export const SettingsPage: React.FC = () => {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm font-semibold shadow-sm"
+                  className="ui-field ui-field-leading ui-field-trailing w-full pl-12 pr-12 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm font-semibold shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 text-zinc-400 hover:text-zinc-600 focus:outline-none"
+                  className="absolute right-4 text-ui-ink/40 hover:text-ui-ink/60 focus:outline-none"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
 
               {authError && (
-                <div className="p-4 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-2xl flex items-center gap-2">
+                <div role="alert" className="ui-error p-4 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-2xl flex items-center gap-2">
                   <CircleAlert className="w-4 h-4 shrink-0" />
                   <span>{authError}</span>
                 </div>
@@ -624,11 +556,11 @@ export const SettingsPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={authFormLoading}
-                className="w-full py-3.5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-bold text-sm hover:opacity-90 active:scale-95 transition-all shadow-md disabled:opacity-50"
+                className="ui-button ui-button-primary w-full py-3.5 rounded-2xl bg-ui-primary text-ui-primary-text font-bold text-sm hover:opacity-90 transition-all shadow-md disabled:opacity-50"
               >
                 {authFormLoading ? "Loading..." : isSignUp ? "Create account" : "Sign in"}
               </button>
-            </form>
+            </ValidatedForm>
 
             <div className="text-center">
               <button
@@ -636,7 +568,7 @@ export const SettingsPage: React.FC = () => {
                   setIsSignUp(!isSignUp);
                   setAuthError(null);
                 }}
-                className="text-xs font-bold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                className="text-xs font-bold text-ui-ink/40 hover:text-ui-text dark:text-ui-ink/40 dark:hover:text-ui-ink/70"
               >
                 {isSignUp ? "Already have an account? Sign in" : "New here? Create account"}
               </button>
@@ -644,16 +576,16 @@ export const SettingsPage: React.FC = () => {
           </div>
         ) : (
           /* Signed In card */
-          <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] transition-colors duration-200">
-            <div className="flex items-center gap-4 bg-white dark:bg-black/20 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-900 shadow-sm">
-              <div className="w-12 h-12 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center shrink-0">
+          <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] transition-colors duration-200">
+            <div className="ui-item-card flex items-center gap-4 bg-ui-surface p-5 rounded-2xl border border-ui-border shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-ui-primary text-ui-primary-text flex items-center justify-center shrink-0">
                 <User className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 block">
+                <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted block">
                   Account
                 </span>
-                <span className="text-base font-bold text-zinc-900 dark:text-zinc-50 block mt-0.5">
+                <span className="text-base font-bold text-ui-text block mt-0.5">
                   {user.email || "Simulated Local User"}
                 </span>
               </div>
@@ -664,7 +596,7 @@ export const SettingsPage: React.FC = () => {
 
       {/* 4. Actions */}
       <div className="space-y-3" id="settings-actions">
-        <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 px-4 block">
+        <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted px-4 block">
           Actions
         </span>
 
@@ -672,10 +604,10 @@ export const SettingsPage: React.FC = () => {
         {user && (
           <button
             onClick={signOut}
-            className="w-full text-left p-6 rounded-[24px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 flex items-center gap-4 transition-all active:scale-98 font-bold text-sm shadow-sm"
+            className="ui-setting-action ui-setting-action--simple w-full text-left p-6 rounded-[24px] bg-ui-section hover:bg-black/10 dark:hover:bg-white/10 flex items-center gap-4 transition-all font-bold text-sm shadow-sm"
             id="action-signout"
           >
-            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-full bg-ui-section text-ui-ink/70 flex items-center justify-center shrink-0">
               <LogOut className="w-5 h-5" />
             </div>
             <div>
@@ -688,10 +620,10 @@ export const SettingsPage: React.FC = () => {
         <button
           onClick={handleDownloadCSV}
           disabled={items.length === 0}
-          className="w-full text-left p-6 rounded-[24px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 flex items-center gap-4 transition-all active:scale-98 font-bold text-sm shadow-sm disabled:opacity-50"
+          className="ui-setting-action ui-setting-action--simple w-full text-left p-6 rounded-[24px] bg-ui-section hover:bg-black/10 dark:hover:bg-white/10 flex items-center gap-4 transition-all font-bold text-sm shadow-sm disabled:opacity-50"
           id="action-export-csv"
         >
-          <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-ui-section text-ui-ink/70 flex items-center justify-center shrink-0">
             <Download className="w-5 h-5" />
           </div>
           <div>
@@ -702,7 +634,7 @@ export const SettingsPage: React.FC = () => {
         {/* 3. Reset data */}
         <button
           onClick={() => setIsResetModalOpen(true)}
-          className="w-full text-left p-6 rounded-[24px] bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center gap-4 transition-all active:scale-98 font-bold text-sm shadow-sm"
+          className="ui-setting-action ui-setting-action--simple w-full text-left p-6 rounded-[24px] bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center gap-4 transition-all font-bold text-sm shadow-sm"
           id="action-reset"
         >
           <div className="w-10 h-10 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
@@ -715,14 +647,14 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* 5. Footer credits */}
-      <div className="pt-8 pb-12 flex flex-col items-center text-center gap-6 text-zinc-400 dark:text-zinc-500 text-xs font-bold transition-all" id="settings-footer-credits">
+      <div className="ui-meta pt-8 pb-12 flex flex-col items-center text-center gap-6 text-ui-muted text-xs font-bold transition-all" id="settings-footer-credits">
         {/* Support Button */}
         <a
           href={SUPPORT_URL}
           target="_blank"
           referrerPolicy="no-referrer"
           rel="noopener noreferrer"
-          className="bg-black text-white dark:bg-white dark:text-black px-6 py-3.5 rounded-full flex items-center gap-2 text-sm shadow-md hover:opacity-90 active:scale-95 transition-all"
+          className="bg-ui-primary text-ui-primary-text px-6 py-3.5 rounded-full flex items-center gap-2 text-sm shadow-md hover:opacity-90 transition-all"
           id="support-project-btn"
         >
           <Heart className="w-4 h-4 fill-current text-rose-500 stroke-rose-500" />
@@ -746,7 +678,7 @@ export const SettingsPage: React.FC = () => {
           <span className="bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
             Kult — version {APP_VERSION}
           </span>
-          <p className="text-zinc-900 dark:text-zinc-50 font-black text-sm tracking-tight mt-1">
+          <p className="text-ui-text font-black text-sm tracking-tight mt-1">
             GASPARD BERTHELIER
           </p>
           <a
@@ -760,21 +692,16 @@ export const SettingsPage: React.FC = () => {
 
       {/* REASSIGNMENT DIALOG MODAL (For deleting content type that is used by items) */}
       {deletingType && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md" onClick={() => setDeletingType(null)} />
-          <div className="relative bg-white dark:bg-zinc-950 w-full max-w-md rounded-[32px] p-6 shadow-2xl border border-zinc-100 dark:border-zinc-800 text-center space-y-6">
-            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
-              Delete "{deletingType.label}" Category?
-            </h3>
-            <p className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
-              There are active items in this category. Please reassign them to a different category before deleting:
+        <Dialog open onClose={() => setDeletingType(null)} title={`Delete "${deletingType.label}" Category?`}>
+            <p className="ui-meta text-sm font-semibold text-ui-muted">
+              Move its items to another category.
             </p>
 
             <div className="relative">
               <select
                 value={reassignTargetId}
                 onChange={(e) => setReassignTargetId(e.target.value)}
-                className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
+                className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
               >
                 {types
                   .filter((t) => t.id !== deletingType.id)
@@ -784,51 +711,42 @@ export const SettingsPage: React.FC = () => {
                     </option>
                   ))}
               </select>
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
                 <ChevronDown className="w-4 h-4" />
               </span>
             </div>
 
-            <div className="flex gap-3 justify-center pt-2">
+            <DialogActions>
               <button
                 onClick={() => setDeletingType(null)}
-                className="px-5 py-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-sm font-bold shadow-sm active:scale-95"
+                className="ui-button ui-button-secondary px-5 py-3.5 rounded-2xl bg-ui-section text-ui-text text-sm font-bold shadow-sm "
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteType}
-                className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold shadow-md active:scale-95"
+                className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold shadow-md "
               >
                 Reassign & Delete
               </button>
-            </div>
-          </div>
-        </div>
+            </DialogActions>
+        </Dialog>
       )}
 
       {/* RESET CONFIRMATION MODAL */}
       {isResetModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md" onClick={() => setIsResetModalOpen(false)} />
-          <div 
-            className="relative bg-white dark:bg-zinc-950 w-full max-w-md rounded-[32px] p-8 shadow-2xl border border-zinc-100 dark:border-zinc-800 text-center space-y-6"
-            id="reset-modal-container"
-          >
-            <h3 className="text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight">
-              Reset Data
-            </h3>
-            <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              Choose how you want to clear your data. This operation is permanent and cannot be undone.
+        <Dialog open onClose={() => setIsResetModalOpen(false)} title="Reset data" id="reset-modal-container">
+            <p className="ui-meta text-sm font-bold text-ui-muted leading-relaxed">
+              This action is permanent.
             </p>
 
-            <div className="flex flex-col gap-3 pt-2">
+            <DialogActions>
               <button
                 onClick={async () => {
                   await clearHistory();
                   setIsResetModalOpen(false);
                 }}
-                className="w-full py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-sm font-bold active:scale-98 transition-all shadow-sm"
+                className="ui-button ui-button-secondary w-full py-4 rounded-2xl bg-ui-section text-ui-text hover:bg-ui-ink/10 text-sm font-bold transition-all shadow-sm"
                 id="reset-clear-history-btn"
               >
                 Clear History
@@ -838,21 +756,20 @@ export const SettingsPage: React.FC = () => {
                   await resetAllData();
                   setIsResetModalOpen(false);
                 }}
-                className="w-full py-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold active:scale-98 transition-all shadow-md"
+                className="w-full py-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold transition-all shadow-md"
                 id="reset-all-data-btn"
               >
                 Reset All
               </button>
               <button
                 onClick={() => setIsResetModalOpen(false)}
-                className="w-full py-4 rounded-2xl bg-black dark:bg-white text-white dark:text-black text-sm font-bold active:scale-98 transition-all shadow-sm"
+                className="ui-button ui-button-primary w-full py-4 rounded-2xl bg-ui-primary text-ui-primary-text text-sm font-bold transition-all shadow-sm"
                 id="reset-cancel-btn"
               >
                 Cancel
               </button>
-            </div>
-          </div>
-        </div>
+            </DialogActions>
+        </Dialog>
       )}
     </div>
   );

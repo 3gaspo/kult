@@ -1,12 +1,15 @@
+import { ActionButton } from '@3gaspo/app-ui/ActionButton';
+import { ValidatedForm } from './ValidatedForm';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useId } from "react";
 import { ContentItem, ContentType } from "../types";
 import { useKult } from "../providers";
-import { X, Trash2, ChevronDown, Calendar, Star, Heart, Hourglass } from "lucide-react";
+import { Dialog, DialogActions } from './Dialog';
+import { Trash2, ChevronDown, Calendar, Star, Heart, Hourglass } from "lucide-react";
 
 interface ContentItemModalProps {
   isOpen: boolean;
@@ -19,6 +22,7 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
   onClose,
   itemToEdit,
 }) => {
+  const formId = useId();
   const { types, settings, addItem, updateItem, deleteItem } = useKult();
 
   // Form States
@@ -156,36 +160,11 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop with Blur */}
-      <div 
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-md" 
-        onClick={onClose}
-      />
-
-      {/* Modal Container */}
-      <div 
-        className="relative bg-white dark:bg-zinc-950 w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 border border-zinc-100 dark:border-zinc-800"
-        id="item-modal-container"
-      >
-        {/* Header */}
-        <div className="p-6 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center bg-white dark:bg-zinc-950">
-          <h2 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
-            {itemToEdit ? "Edit Content" : "Add Content"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
-            id="close-modal-btn"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+    <Dialog open={isOpen} onClose={onClose} title={itemToEdit ? 'Edit content' : 'Add content'} id="item-modal-container" closeButtonId="close-modal-btn">
         {/* Scrollable Form Content */}
-        <form onSubmit={handleSave} className="overflow-y-auto p-6 space-y-6 flex-1 text-zinc-900 dark:text-zinc-50">
+        <ValidatedForm id={formId} onSubmit={handleSave} className="space-y-6 text-ui-text">
           {error && (
-            <div className="p-4 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-sm font-semibold rounded-2xl flex items-center gap-2">
+            <div role="alert" className="ui-error p-4 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-sm font-semibold rounded-2xl flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0" />
               {error}
             </div>
@@ -193,7 +172,7 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
 
           {/* Title Input */}
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Title
             </label>
             <input
@@ -201,23 +180,25 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
               placeholder="What's the title?"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
+              className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
               id="modal-title-input"
+              required
             />
           </div>
 
           {/* Type and Status in Row */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="ui-filter-grid">
             <div className="space-y-2">
-              <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Type
               </label>
               <div className="relative">
                 <select
                   value={typeId}
                   onChange={(e) => setTypeId(e.target.value)}
-                  className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all appearance-none text-base shadow-sm font-medium"
+                  className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all appearance-none text-base shadow-sm font-medium"
                   id="modal-type-select"
+                  required
                 >
                   <option value="" disabled>Select Type</option>
                   {types.map((t) => (
@@ -226,28 +207,28 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
                   <ChevronDown className="w-5 h-5" />
                 </span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Status
               </label>
               <div className="relative">
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as any)}
-                  className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all appearance-none text-base shadow-sm font-medium"
+                  className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all appearance-none text-base shadow-sm font-medium"
                   id="modal-status-select"
                 >
                   <option value="to_complete">To Complete</option>
                   <option value="ongoing">Ongoing</option>
                   <option value="completed">Completed</option>
                 </select>
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
                   <ChevronDown className="w-5 h-5" />
                 </span>
               </div>
@@ -256,7 +237,7 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
 
           {/* Author / Creator */}
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Author / Creator
             </label>
             <input
@@ -264,15 +245,15 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
               placeholder="e.g. Christopher Nolan, Haruki Murakami"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
+              className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
               id="modal-author-input"
             />
           </div>
 
           {/* Published and Added Dates */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="ui-filter-grid">
             <div className="space-y-2">
-              <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Release Date / Year
               </label>
               <input
@@ -280,20 +261,20 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
                 placeholder="e.g. 2024 or 2024-05-15"
                 value={publishedDate}
                 onChange={(e) => setPublishedDate(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
+                className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
                 id="modal-pubdate-input"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Added Date
               </label>
               <input
                 type="date"
                 value={addedDate}
                 onChange={(e) => setAddedDate(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
+                className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
                 id="modal-addeddate-input"
               />
             </div>
@@ -302,89 +283,89 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
           {/* Completed Date (Only visible when status is completed) */}
           {status === "completed" && (
             <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
-              <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Completed Date
               </label>
               <input
                 type="date"
                 value={completedDate}
                 onChange={(e) => setCompletedDate(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
+                className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
                 id="modal-completeddate-input"
               />
             </div>
           )}
 
           {/* Metrics Selectors (Priority, Pleasure, Length) */}
-          <div className="bg-zinc-50 dark:bg-zinc-900/60 p-4 rounded-[24px] space-y-4">
+          <div className="ui-rating-panel bg-ui-section p-4 rounded-[24px] space-y-4">
             {/* Priority Selector */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:items-center">
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-amber-500 shrink-0" />
-                <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Priority</span>
+                <span className="text-sm font-bold text-ui-ink/70">Priority</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="ui-rating-group">
                 {[1, 2, 3, 4, 5].map((val) => (
-                  <button
+                  <ActionButton
                     key={val}
                     type="button"
-                    onClick={() => setPriority(val)}
-                    className={`w-9 h-9 rounded-full font-bold text-sm flex items-center justify-center transition-all ${
+                    aria-pressed={priority === val} aria-label={`Priority ${val} of 5`} onClick={() => setPriority(val)}
+                    className={`ui-compact-control w-9 h-9 rounded-full font-bold text-sm flex items-center justify-center transition-all ${
                       priority === val
-                        ? "bg-black text-white dark:bg-white dark:text-black scale-110 shadow-sm"
-                        : "bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                        ? "bg-ui-primary text-ui-primary-text shadow-sm"
+                        : "bg-ui-surface text-ui-ink/60 hover:bg-ui-ink/10"
                     }`}
                   >
                     {val}
-                  </button>
+                  </ActionButton>
                 ))}
               </div>
             </div>
 
             {/* Pleasure Selector */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:items-center">
               <div className="flex items-center gap-2">
                 <Heart className="w-5 h-5 text-rose-500 shrink-0" />
-                <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Motivation</span>
+                <span className="text-sm font-bold text-ui-ink/70">Motivation</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="ui-rating-group">
                 {[1, 2, 3, 4, 5].map((val) => (
-                  <button
+                  <ActionButton
                     key={val}
                     type="button"
-                    onClick={() => setPleasure(val)}
-                    className={`w-9 h-9 rounded-full font-bold text-sm flex items-center justify-center transition-all ${
+                    aria-pressed={pleasure === val} aria-label={`Pleasure ${val} of 5`} onClick={() => setPleasure(val)}
+                    className={`ui-compact-control w-9 h-9 rounded-full font-bold text-sm flex items-center justify-center transition-all ${
                       pleasure === val
-                        ? "bg-black text-white dark:bg-white dark:text-black scale-110 shadow-sm"
-                        : "bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                        ? "bg-ui-primary text-ui-primary-text shadow-sm"
+                        : "bg-ui-surface text-ui-ink/60 hover:bg-ui-ink/10"
                     }`}
                   >
                     {val}
-                  </button>
+                  </ActionButton>
                 ))}
               </div>
             </div>
 
             {/* Length Selector */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:items-center">
               <div className="flex items-center gap-2">
                 <Hourglass className="w-5 h-5 text-indigo-500 shrink-0" />
-                <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Length</span>
+                <span className="text-sm font-bold text-ui-ink/70">Length</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="ui-rating-group">
                 {[1, 2, 3, 4, 5].map((val) => (
-                  <button
+                  <ActionButton
                     key={val}
                     type="button"
-                    onClick={() => setLength(val)}
-                    className={`w-9 h-9 rounded-full font-bold text-sm flex items-center justify-center transition-all ${
+                    aria-pressed={length === val} aria-label={`Length ${val} of 5`} onClick={() => setLength(val)}
+                    className={`ui-compact-control w-9 h-9 rounded-full font-bold text-sm flex items-center justify-center transition-all ${
                       length === val
-                        ? "bg-black text-white dark:bg-white dark:text-black scale-110 shadow-sm"
-                        : "bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                        ? "bg-ui-primary text-ui-primary-text shadow-sm"
+                        : "bg-ui-surface text-ui-ink/60 hover:bg-ui-ink/10"
                     }`}
                   >
                     {val}
-                  </button>
+                  </ActionButton>
                 ))}
               </div>
             </div>
@@ -392,7 +373,7 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
 
           {/* Keywords Input */}
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Keywords (comma-separated)
             </label>
             <input
@@ -400,14 +381,14 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
               placeholder="e.g. sci-fi, classics, drama, philosophy"
               value={keywordsStr}
               onChange={(e) => setKeywordsStr(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
+              className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
               id="modal-keywords-input"
             />
           </div>
 
           {/* Note Textarea */}
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-extrabold tracking-widest text-zinc-400 dark:text-zinc-500">
+            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Notes
             </label>
             <textarea
@@ -415,45 +396,46 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
+              className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
               id="modal-note-textarea"
             />
           </div>
-        </form>
+        </ValidatedForm>
 
         {/* Footer Actions */}
-        <div className="p-6 bg-zinc-50 dark:bg-zinc-900/40 border-t border-zinc-100 dark:border-zinc-900 flex justify-between items-center gap-4">
+        <DialogActions form={formId}>
           <div>
             {itemToEdit && (
               <>
                 {!showConfirmDelete ? (
-                  <button
+                  <ActionButton
                     type="button"
                     onClick={() => setShowConfirmDelete(true)}
-                    className="flex items-center gap-2 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-bold text-sm px-4 py-3 rounded-2xl hover:bg-rose-50 dark:hover:bg-rose-950/20 active:scale-95 transition-all"
+                    className="flex items-center gap-2 text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-bold text-sm px-4 py-3 rounded-2xl hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all"
                     id="modal-trigger-delete"
+                    aria-label="Delete content"
                   >
                     <Trash2 className="w-5 h-5 shrink-0" />
                     <span className="hidden sm:inline">Delete</span>
-                  </button>
+                  </ActionButton>
                 ) : (
-                  <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-150">
-                    <button
+                  <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-150">
+                    <ActionButton
                       type="button"
-                      onClick={handleDelete}
-                      className="bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs px-3.5 py-2.5 rounded-xl transition-all"
+                      busyLabel="Deleting…" onClick={handleDelete}
+                      className="ui-button ui-button-danger bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs px-3.5 py-2.5 rounded-xl transition-all"
                       id="modal-confirm-delete"
                     >
-                      Yes, Delete
-                    </button>
-                    <button
+                      Delete
+                    </ActionButton>
+                    <ActionButton
                       type="button"
                       onClick={() => setShowConfirmDelete(false)}
-                      className="bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs px-3.5 py-2.5 rounded-xl transition-all"
+                      className="ui-button ui-button-secondary bg-ui-ink/10 text-ui-ink/70 font-bold text-xs px-3.5 py-2.5 rounded-xl transition-all"
                       id="modal-cancel-delete"
                     >
-                      No
-                    </button>
+                      Cancel
+                    </ActionButton>
                   </div>
                 )}
               </>
@@ -461,25 +443,23 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            <button
+            <ActionButton
               type="button"
               onClick={onClose}
-              className="px-6 py-3.5 rounded-2xl bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-base hover:opacity-90 active:scale-95 transition-all shadow-sm"
+              className="ui-button ui-button-secondary px-6 py-3.5 rounded-2xl bg-ui-ink/10 text-ui-text font-bold text-base hover:opacity-90 transition-all shadow-sm"
               id="modal-cancel-btn"
             >
               Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="px-8 py-3.5 rounded-2xl bg-black dark:bg-white text-white dark:text-black font-bold text-base hover:opacity-90 active:scale-95 transition-all shadow-md"
+            </ActionButton>
+            <ActionButton
+              type="submit"
+              className="ui-button ui-button-primary px-8 py-3.5 rounded-2xl bg-ui-primary text-ui-primary-text font-bold text-base hover:opacity-90 transition-all shadow-md"
               id="modal-save-btn"
             >
               Save
-            </button>
+            </ActionButton>
           </div>
-        </div>
-      </div>
-    </div>
+        </DialogActions>
+    </Dialog>
   );
 };

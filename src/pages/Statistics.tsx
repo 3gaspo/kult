@@ -1,3 +1,4 @@
+import { formatNumber } from '@3gaspo/app-ui/formats';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -220,24 +221,24 @@ export const StatisticsPage: React.FC = () => {
     <div className="space-y-6 pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50" id="stats-title">
+        <h1 className="text-4xl font-bold tracking-tight text-ui-text" id="stats-title">
           Statistics
         </h1>
       </div>
 
       {/* Interactive Filter Box */}
-      <div className="bg-black/5 dark:bg-white/5 p-6 rounded-[32px] space-y-4 transition-colors duration-200">
-        <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+      <div className="ui-section-card bg-ui-section p-6 rounded-[32px] space-y-4 transition-colors duration-200">
+        <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
           Analytics Filter
         </span>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="ui-filter-grid grid grid-cols-2 gap-4">
           {/* Category Dropdown */}
           <div className="relative">
             <select
               value={selectedTypeId}
               onChange={(e) => setSelectedTypeId(e.target.value)}
-              className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
-              id="stats-category-filter"
+              className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
+              aria-label="Category" id="stats-category-filter"
             >
               <option value="all">All Categories</option>
               {types.map((t) => (
@@ -246,7 +247,7 @@ export const StatisticsPage: React.FC = () => {
                 </option>
               ))}
             </select>
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
               <ChevronDown className="w-4 h-4" />
             </span>
           </div>
@@ -256,8 +257,8 @@ export const StatisticsPage: React.FC = () => {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full pl-4 pr-10 py-3.5 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
-              id="stats-year-filter"
+              className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
+              aria-label="Year" id="stats-year-filter"
             >
               <option value="all">All Time</option>
               {yearsList.map((yr) => (
@@ -266,7 +267,7 @@ export const StatisticsPage: React.FC = () => {
                 </option>
               ))}
             </select>
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ui-ink/40">
               <ChevronDown className="w-4 h-4" />
             </span>
           </div>
@@ -275,87 +276,87 @@ export const StatisticsPage: React.FC = () => {
 
       {/* Bento Grid Stats Cards */}
       <div className="grid grid-cols-2 gap-3" id="stats-bento-grid">
-        <div className="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col justify-between space-y-3">
+        <div className="bg-ui-section p-4 rounded-2xl flex flex-col justify-between space-y-3">
           <div className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <CheckSquare className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 block">
+            <span className="ui-section-title text-[9px] uppercase font-black tracking-widest text-ui-muted block">
               Completions
             </span>
-            <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 block mt-1">
+            <span className="text-2xl font-black tracking-tight text-ui-text block mt-1">
               {totalCompletedInSelectedYear}
             </span>
-            <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-1 block">
+            <span className="ui-meta text-[10px] font-semibold text-ui-muted mt-1 block">
               {selectedYear === "all" ? "All-time total" : `In ${selectedYear}`}
             </span>
           </div>
         </div>
 
-        <div className="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col justify-between space-y-3">
+        <div className="bg-ui-section p-4 rounded-2xl flex flex-col justify-between space-y-3">
           <div className="w-8 h-8 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 block">
+            <span className="ui-section-title text-[9px] uppercase font-black tracking-widest text-ui-muted block">
               Monthly Avg
             </span>
-            <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 block mt-1">
-              {averageCompletedPerMonth.toFixed(1)}
+            <span className="text-2xl font-black tracking-tight text-ui-text block mt-1">
+              {formatNumber(averageCompletedPerMonth, 1)}
             </span>
-            <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-1 block">
+            <span className="ui-meta text-[10px] font-semibold text-ui-muted mt-1 block">
               Items / month
             </span>
           </div>
         </div>
 
-        <div className="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col justify-between space-y-3">
+        <div className="bg-ui-section p-4 rounded-2xl flex flex-col justify-between space-y-3">
           <div className="w-8 h-8 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <Inbox className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 block">
+            <span className="ui-section-title text-[9px] uppercase font-black tracking-widest text-ui-muted block">
               In Backlog
             </span>
-            <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 block mt-1">
+            <span className="text-2xl font-black tracking-tight text-ui-text block mt-1">
               {backlogCount}
             </span>
-            <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-1 block">
+            <span className="ui-meta text-[10px] font-semibold text-ui-muted mt-1 block">
               Waiting items
             </span>
           </div>
         </div>
 
-        <div className="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col justify-between space-y-3">
+        <div className="bg-ui-section p-4 rounded-2xl flex flex-col justify-between space-y-3">
           <div className="w-8 h-8 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
             <Activity className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 block">
+            <span className="ui-section-title text-[9px] uppercase font-black tracking-widest text-ui-muted block">
               Ongoing
             </span>
-            <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 block mt-1">
+            <span className="text-2xl font-black tracking-tight text-ui-text block mt-1">
               {ongoingCount}
             </span>
-            <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-1 block">
+            <span className="ui-meta text-[10px] font-semibold text-ui-muted mt-1 block">
               Currently active
             </span>
           </div>
         </div>
 
         {settings?.hideOverallScore === false && (
-          <div className="bg-black/5 dark:bg-white/5 p-4 rounded-2xl flex flex-col justify-between space-y-3 col-span-2">
+          <div className="bg-ui-section p-4 rounded-2xl flex flex-col justify-between space-y-3 col-span-2">
             <div className="w-8 h-8 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
               <Flame className="w-4 h-4 fill-rose-500 text-rose-500" />
             </div>
             <div>
-              <span className="text-[9px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500 block">
+              <span className="ui-section-title text-[9px] uppercase font-black tracking-widest text-ui-muted block">
                 Average EP Score
               </span>
-              <span className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 block mt-1">
+              <span className="text-2xl font-black tracking-tight text-ui-text block mt-1">
                 {overallAvgScore}
               </span>
-              <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mt-1 block">
+              <span className="ui-meta text-[10px] font-semibold text-ui-muted mt-1 block">
                 Across all backlog items
               </span>
             </div>
@@ -367,25 +368,25 @@ export const StatisticsPage: React.FC = () => {
       <div className="grid grid-cols-1 gap-6">
         
         {/* 1. Monthly Completion Chart */}
-        <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] transition-colors duration-200 space-y-6">
+        <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] transition-colors duration-200 space-y-6">
           <div>
-            <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+            <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
               Completed Per Month
             </span>
-            <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
+            <h3 className="ui-item-title text-lg font-bold tracking-tight text-ui-text mt-1">
               {selectedYear === "all" ? "Monthly completions (All time)" : `Completions in ${selectedYear}`}
             </h3>
           </div>
 
           {/* SVG Custom Responsive Bar Chart */}
-          <div className="w-full h-48 bg-white dark:bg-black/20 rounded-2xl p-4 flex flex-col justify-between border border-zinc-100 dark:border-zinc-900 shadow-sm">
+          <div className="ui-chart ui-item-card w-full h-48 bg-ui-surface rounded-2xl p-4 flex flex-col justify-between border border-ui-border shadow-sm">
             <div className="flex-1 flex items-end justify-between gap-1.5 h-32 pt-2">
               {monthlyChartData.map((d, idx) => {
                 const pct = (d.value / maxMonthlyValue) * 100;
                 return (
-                  <div key={idx} className="flex-1 flex flex-col items-center group h-full justify-end relative">
+                  <div key={idx} tabIndex={0} role="img" aria-label={`${d.label}: ${d.value} completed`} className="ui-chart-bar flex-1 min-w-0 flex flex-col items-center group h-full justify-end relative">
                     {/* Tooltip on Hover */}
-                    <div className="absolute bottom-full mb-1.5 opacity-0 group-hover:opacity-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold text-[10px] px-2 py-1 rounded shadow-md pointer-events-none transition-opacity duration-150 z-20 whitespace-nowrap">
+                    <div className={`ui-chart-tooltip absolute bottom-full mb-1.5 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 z-20 ${idx < 6 ? "left-0" : "right-0"}`}>
                       {d.value} completed
                     </div>
                     
@@ -393,10 +394,10 @@ export const StatisticsPage: React.FC = () => {
                     <div 
                       className={`w-full rounded-t-lg transition-all duration-500 ${
                         d.isFuture 
-                          ? "bg-zinc-100 dark:bg-zinc-800"
+                          ? "bg-ui-section"
                           : d.value > 0 
-                            ? "bg-black dark:bg-white" 
-                            : "bg-zinc-50 dark:bg-zinc-900"
+                            ? "bg-ui-primary"
+                            : "bg-ui-section"
                       }`}
                       style={{ height: `${Math.max(4, pct)}%` }}
                     />
@@ -406,9 +407,9 @@ export const StatisticsPage: React.FC = () => {
             </div>
 
             {/* X Axis Labels */}
-            <div className="flex justify-between text-[9px] font-bold text-zinc-400 dark:text-zinc-500 mt-2 border-t border-zinc-100 dark:border-zinc-900 pt-2">
+            <div className="ui-chart-axis grid grid-cols-12 font-medium mt-2 border-t border-ui-border pt-2">
               {monthlyChartData.map((d, idx) => (
-                <span key={idx} className="flex-1 text-center">
+                <span key={idx} className="min-w-0 text-center">
                   {d.label}
                 </span>
               ))}
@@ -417,28 +418,28 @@ export const StatisticsPage: React.FC = () => {
         </div>
 
         {/* 2. Completed Per Category Chart */}
-        <div className="bg-black/5 dark:bg-white/5 p-6 sm:p-8 rounded-[32px] transition-colors duration-200 space-y-6">
+        <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] transition-colors duration-200 space-y-6">
           <div>
-            <span className="text-[10px] uppercase font-black tracking-widest text-zinc-400 dark:text-zinc-500">
+            <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
               Completed Per Category
             </span>
-            <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-1">
+            <h3 className="ui-item-title text-lg font-bold tracking-tight text-ui-text mt-1">
               Distribution of completions
             </h3>
           </div>
 
-          <div className="bg-white dark:bg-black/20 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-900 shadow-sm space-y-4">
+          <div className="ui-chart ui-chart-legend ui-item-card bg-ui-surface rounded-2xl p-6 border border-ui-border">
             {categoryChartData.map((d, idx) => {
               const pct = (d.value / maxCategoryValue) * 100;
               return (
                 <div key={idx} className="space-y-1.5">
-                  <div className="flex justify-between text-xs font-bold">
-                    <span className="text-zinc-700 dark:text-zinc-300">{d.label}</span>
-                    <span className="text-zinc-500 dark:text-zinc-400">{d.value}</span>
+                  <div className="ui-chart-row text-xs font-semibold">
+                    <span className="text-ui-ink/70">{d.label}</span>
+                    <span className="text-ui-muted">{d.value}</span>
                   </div>
-                  <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-900 rounded-full overflow-hidden">
+                  <div className="h-3 w-full bg-ui-section rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-black dark:bg-white rounded-full transition-all duration-500"
+                      className="h-full bg-ui-primary rounded-full transition-all duration-500"
                       style={{ width: `${d.value > 0 ? Math.max(4, pct) : 0}%` }}
                     />
                   </div>
