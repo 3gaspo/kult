@@ -1,3 +1,4 @@
+import { ActionButton } from '@3gaspo/app-ui/ActionButton';
 import { ValidatedForm } from '../components/ValidatedForm';
 import { SettingsSwitch } from '../components/SettingsSwitch';
 import { PageHeader } from '../components/PageHeader';
@@ -741,7 +742,7 @@ export const SettingsPage: React.FC = () => {
             </p>
 
             <DialogActions>
-              <button
+              <ActionButton scope="kult-reset" busyLabel="Resetting…"
                 onClick={async () => {
                   await clearHistory();
                   setIsResetModalOpen(false);
@@ -750,8 +751,8 @@ export const SettingsPage: React.FC = () => {
                 id="reset-clear-history-btn"
               >
                 Clear History
-              </button>
-              <button
+              </ActionButton>
+              <ActionButton scope="kult-reset" busyLabel="Resetting…"
                 onClick={async () => {
                   await resetAllData();
                   setIsResetModalOpen(false);
@@ -760,14 +761,14 @@ export const SettingsPage: React.FC = () => {
                 id="reset-all-data-btn"
               >
                 Reset All
-              </button>
-              <button
+              </ActionButton>
+              <ActionButton scope="kult-reset"
                 onClick={() => setIsResetModalOpen(false)}
                 className="ui-button ui-button-primary w-full py-4 rounded-2xl bg-ui-primary text-ui-primary-text text-sm font-bold transition-all shadow-sm"
                 id="reset-cancel-btn"
               >
                 Cancel
-              </button>
+              </ActionButton>
             </DialogActions>
         </Dialog>
       )}
