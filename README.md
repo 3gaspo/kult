@@ -1,93 +1,105 @@
-# Kult — Personal Cultural Backlog Manager
+# Kult
 
-**Kult** is a sleek, personal media and content database app designed to organize your cultural backlog (books, movies, TV series, video games, articles, podcasts, and custom media) and smart-recommend what to consume next using a customizable prioritization algorithm.
+Kult organise une liste de contenus culturels à lire, regarder ou terminer. Il classe les contenus à traiter selon une priorité calculée et conserve un historique des contenus terminés.
 
----
+## Fonctionnalités
 
-## 🌟 Key Features
+- Types Book, Movie, Series et Other par défaut ; création, renommage, réorganisation et suppression des types avec réaffectation des contenus.
+- Titre, auteur ou créateur, date de publication, dates d’ajout et de fin, mots-clés et notes.
+- Statuts Backlog, Ongoing et Completed, avec réouverture d’un contenu terminé vers Backlog ou Ongoing.
+- Notes de 1 à 5 pour la priorité, la motivation et la longueur ; formule pondérée intégrant aussi fraîcheur et ancienneté.
+- Accueil filtré par type ; historique avec recherche sur titre, auteur et mots-clés, filtres et tri.
+- Statistiques par période, export CSV et paramètres de formule et d’affichage.
+- Thèmes clair et sombre persistants, stockage local ou Firebase.
 
-### 🎯 Smart Priority Engine ("Effective Priority")
-Instead of a static to-read/to-watch list, Kult dynamically computes an **Effective Priority** score for every item in your queue using a balanced formula that evaluates:
-- **Priority (1-5):** How important or urgent this item is to you.
-- **Expected Pleasure (1-5):** How much you expect to enjoy it.
-- **Length / Shortness (1-5):** Quick wins vs. long epic commitments.
-- **Freshness:** Boosts recently added items so new discoveries don't get buried immediately.
-- **Backlog Aging:** Prevents older items from sitting forgotten indefinitely.
+## Écrans
 
-> You can fine-tune all formula weights directly in **Settings** to match your personal decision style!
+| URL | Écran |
+| --- | --- |
+| `/home` | Home : contenus en attente ou en cours et ajout |
+| `/history` | History : contenus terminés, recherche et réouverture |
+| `/stats` | Statistics |
+| `/settings` | Settings : types, formule, affichage, thème, compte et export |
 
----
+La racine `/` redirige vers l’accueil. La connexion s’affiche lorsqu’aucune session n’est active. Les écrans secondaires sont chargés à la demande.
 
-### 📚 Comprehensive Content Tracking
-- **Multiple Media Types:** Out-of-the-box support for Books, Movies, Series, and custom types.
-- **Status Workflows:** Categorize items into:
-  - ⏳ **To Complete** (Your backlog queue)
-  - 📖 **Ongoing** (Currently reading, watching, or playing)
-  - ✅ **Completed** (Finished items with completion dates)
-- **Detailed Metadata:** Record authors/creators, publication years, priority levels, estimated length, custom tags/keywords, and personal notes.
-- **Smart Sorting & Filtering:** Instantly filter by status, media type, tag, or search term, and sort by Effective Priority, Rating, Title, or Date Added.
+## Stack et organisation
 
----
+React 19, TypeScript 5.8, Vite 6, Tailwind CSS 4, React Router, Lucide et Firebase Authentication / Firestore. Les graphiques sont des composants HTML/CSS propres à Kult.
 
-### ⚙️ Customizable Media Types & Algorithm
-- **Custom Content Types:** Create, rename, and reorder content types (e.g., Video Games, Podcasts, Comics, Research Papers).
-- **Custom Weight Sliders:** Tailor the priority algorithm by adjusting weights for Priority, Pleasure, Shortness, Freshness, and Backlog Aging.
+- [src/pages/](src/pages/) : écrans de l’application.
+- [src/providers/](src/providers/) : contexte et fournisseurs locaux/Firebase.
+- [src/components/ContentItemModal.tsx](src/components/ContentItemModal.tsx) : création et édition d’un contenu.
+- [src/utils/formula.ts](src/utils/formula.ts) : calcul de la priorité effective.
+- [src/types.ts](src/types.ts) : modèles, types par défaut et poids initiaux.
+- [src/styles/](src/styles/) : imports des styles partagés et styles propres à l’application.
 
----
+## Installation
 
-### 💾 Data Ownership, Import & Export
-- **Cloud & Offline Sync:** Cloud synchronization with Firebase Firestore and Authentication, with local storage support.
-- **JSON & CSV Backup:** Export your entire collection to JSON or CSV at any time, or restore from a backup file.
+Environnement de référence : Node.js 24 et npm. Exécuter les commandes depuis ce dépôt.
 
----
+```bash
+npm ci
+npm run dev
+```
 
-### 📱 Progressive Web App (PWA) & Mobile Friendly
-- **Mobile First Design:** Fully responsive dark/light interface optimized for smartphones, tablets, and desktops.
-- **Home Screen Installation:** Web App Manifest and Apple Touch Icon support for adding Kult to iOS and Android home screens as a standalone application.
+Le serveur de développement écoute sur le port 3000. Ouvrir `http://localhost:3000`.
 
----
+## Configuration et données
 
-### 🎨 Theme & Customization
-- **Dark & Light Mode:** Automatic or manual toggle between dark and light color schemes.
-- **Dev Mode Quick Access:** Seamless developer login helpers for rapid testing and dev environments.
-- **Community Support & Credits:** Direct link to creator support ([Ko-fi](https://ko-fi.com/3gaspo)) and version tracking.
+Sans configuration Firebase complète, Kult utilise des fournisseurs locaux et une session de développement. Avec Firebase, les données sont rattachées au compte connecté.
 
----
+Le mode local conserve ses données dans le `localStorage` du navigateur, sans synchronisation entre appareils. Sa session de développement n’est pas une authentification distante. Changer de mode de stockage ne transfère pas automatiquement ces données.
 
-## 🛠️ Tech Stack
+Pour utiliser Firebase, copier [.env.example](.env.example) vers `.env.local` et renseigner la configuration de l’application web :
 
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS
-- **Icons:** Lucide React
-- **Animations:** Motion (`motion/react`)
-- **Backend & Database:** Firebase Auth & Cloud Firestore
-- **State & Storage:** LocalStorage / Firestore sync
+```dotenv
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
 
----
+Activer l’authentification email/mot de passe et Firestore dans le projet Firebase concerné. Ces variables sont lues par Vite au démarrage et lors du build : redémarrer le serveur ou reconstruire après une modification. Conserver les fichiers d’environnement locaux hors Git.
 
-## 🚀 Getting Started
+## Commandes et validation
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+| Commande | Rôle |
+| --- | --- |
+| `npm ci` | Installer les versions du lockfile, y compris l’archive UI locale |
+| `npm run dev` | Lancer le serveur de développement sur le port 3000 |
+| `npm run lint` | Vérifier les types avec `tsc --noEmit` |
+| `npm run check:ui` | Vérifier l’archive UI, son empreinte, le lockfile et les réexports |
+| `npm run build` | Exécuter `prebuild` puis générer le site statique dans `dist/` |
+| `npm run preview` | Prévisualiser le dernier build localement |
 
-2. **Run dev server:**
-   ```bash
-   npm run dev
-   ```
+Aucun script `npm test` n’est défini actuellement ; les contrôles disponibles sont le typage, la vérification du package UI et le build.
 
-3. **Build for production:**
-   ```bash
-   npm run build
-   ```
+## Classement
 
----
+La priorité effective combine la priorité, la motivation, la préférence pour les contenus courts, la fraîcheur depuis l’ajout et l’ancienneté du backlog. Les pondérations se règlent dans les paramètres. Le score est calculé dans `src/utils/formula.ts` et affiché avec une décimale.
 
-*Created by Gaspard Berthelier — [Support on Ko-fi](https://ko-fi.com/3gaspo)*
-
+L’export disponible dans les paramètres est un CSV. L’application ne propose actuellement pas de restauration de sauvegarde JSON.
 
 ## Interface partagée
 
-L'application utilise le package privé versionné `@3gaspo/app-ui` pour ses composants, styles et formats communs. Son archive est incluse dans `vendor` : `npm ci` et `npm run build` fonctionnent avec ce dépôt seul.
+L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.5, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. L’interface utilise Inter et des thèmes clair et sombre communs. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
 
-`npm run check:ui` vérifie l'archive, le lockfile, les sources installées et les points d'entrée communs. Ce contrôle s'exécute aussi avant le build. Les sources du socle sont maintenues dans le dépôt indépendant `app-ui` ; les données, calculs, parcours et styles métier restent ici. Les formats de stockage et d'export ne sont pas modifiés par les conventions d'affichage.
+L’archive est incluse dans [vendor/](vendor/) et référencée par `package.json` et `package-lock.json`. Ce dépôt est installable et déployable seul : aucun accès au dépôt source voisin `app-ui` ni à un registre privé n’est nécessaire. Relancer `npm ci` après un pull qui change les dépendances. La vérification du package partagé s’exécute automatiquement avant le build.
+
+## Déploiement
+
+Le site statique est servi par Firebase Hosting depuis `dist/`. [firebase.json](firebase.json) redirige les routes de l’application vers `index.html` et déclare aussi les règles et index Firestore.
+
+Après avoir authentifié la CLI Firebase et sélectionné le bon projet :
+
+```bash
+git pull
+npm ci
+npm run build
+firebase deploy --only hosting
+```
+
+Ajouter `--project ID_DU_PROJET` si aucun projet n’est sélectionné. Un `firebase deploy` sans restriction peut aussi publier les règles et index Firestore déclarés. Un retour à une version conservée dans l’historique Firebase Hosting restaure le site, pas les données.
