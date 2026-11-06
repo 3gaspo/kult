@@ -2,6 +2,10 @@
 
 Kult organise une liste de contenus culturels à lire, regarder ou terminer. Il classe les contenus à traiter selon une priorité calculée et conserve un historique des contenus terminés.
 
+Le nom affiché dans l’application, les favoris et les métadonnées d’installation web est **Kult** ; le nom technique npm est `kult`. Le manifeste est dans `public/manifest.json`, l’icône de l’application dans `public/kult.svg` et le logo des paramètres dans `public/gaspo_logo.svg`.
+
+Les icônes utilisent un canevas de 512 × 512, un fond noir opaque et des formes gris-blanc `#D9D9D9`. Les PNG `public/kult-192.png` et `kult-512.png` sont les exports standard ; `kult-maskable-512.png` (Android) et `kult-apple-touch-icon.png` (Apple, 180 × 180) appliquent la même marge de 10 % par côté, avec un symbole à 80 % de sa taille d’origine. Ils dérivent du SVG et sont référencés par le manifeste et les métadonnées Apple. Après modification du SVG, régénérer ces exports.
+
 ## Fonctionnalités
 
 - Types Book, Movie, Series et Other par défaut ; création, renommage, réorganisation et suppression des types avec réaffectation des contenus.
@@ -85,7 +89,7 @@ L’export disponible dans les paramètres est un CSV. L’application ne propos
 
 ## Interface partagée
 
-L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.6, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. L’interface utilise Inter et des thèmes clair et sombre communs. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
+L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.8, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. L’interface utilise Inter et des thèmes clair et sombre communs. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
 
 L’archive est incluse dans [vendor/](vendor/) et référencée par `package.json` et `package-lock.json`. Ce dépôt est installable et déployable seul : aucun accès au dépôt source voisin `app-ui` ni à un registre privé n’est nécessaire. Relancer `npm ci` après un pull qui change les dépendances. La vérification du package partagé s’exécute automatiquement avant le build.
 
