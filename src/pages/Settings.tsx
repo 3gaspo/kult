@@ -179,15 +179,14 @@ export const SettingsPage: React.FC = () => {
     const isUsed = items.some((item) => item.typeId === type.id);
     if (!isUsed) {
       // Delete immediately if not used
-      deleteType(type.id);
-      return;
+      return deleteType(type.id);
     }
 
     // Otherwise, show safe reassignment modal
     setDeletingType(type);
     // Find default target (first available type that is NOT this one)
     const otherType = types.find((t) => t.id !== type.id);
-    setReassignTargetId(otherType?.id || "other");
+    setReassignTargetId(otherType?.id || "");
   };
 
   const confirmDeleteType = async () => {
@@ -348,13 +347,12 @@ export const SettingsPage: React.FC = () => {
                     <ArrowDown className="w-4 h-4" />
                   </button>
                   {/* Delete category */}
-                  <button aria-label="Delete"
+                  <ActionButton scope="kult-types" aria-label="Delete"
                     onClick={() => triggerDeleteType(t)}
-                    disabled={types.length <= 1}
                     className="ui-icon-button ui-row-action bg-zinc-50 hover:bg-rose-50 text-ui-ink/40 hover:text-rose-600 dark:bg-zinc-900/80 dark:hover:bg-rose-950/20 dark:hover:text-rose-400 flex items-center justify-center transition-all disabled:opacity-30"
                   >
                     <Trash2 className="w-4 h-4" />
-                  </button>
+                  </ActionButton>
                 </div>
               </div>
             ))}
@@ -704,6 +702,7 @@ export const SettingsPage: React.FC = () => {
                 onChange={(e) => setReassignTargetId(e.target.value)}
                 className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
               >
+                {types.length === 1 && <option value="">Uncategorized</option>}
                 {types
                   .filter((t) => t.id !== deletingType.id)
                   .map((t) => (
@@ -724,12 +723,12 @@ export const SettingsPage: React.FC = () => {
               >
                 Cancel
               </button>
-              <button
+              <ActionButton scope="kult-types"
                 onClick={confirmDeleteType}
                 className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold shadow-md "
               >
                 Reassign & Delete
-              </button>
+              </ActionButton>
             </DialogActions>
         </Dialog>
       )}

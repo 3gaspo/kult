@@ -103,7 +103,7 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
       setError("Title is required.");
       return;
     }
-    if (!typeId) {
+    if (!typeId && types.length > 0) {
       setError("Please select a content type.");
       return;
     }
@@ -112,7 +112,7 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
       return;
     }
 
-    const typeLabel = types.find((t) => t.id === typeId)?.label || "Other";
+    const typeLabel = types.find((t) => t.id === typeId)?.label || "Uncategorized";
     const keywords = keywordsStr
       .split(",")
       .map((k) => k.trim())
@@ -198,9 +198,9 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
                   onChange={(e) => setTypeId(e.target.value)}
                   className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all appearance-none text-base shadow-sm font-medium"
                   id="modal-type-select"
-                  required
+                  required={types.length > 0}
                 >
-                  <option value="" disabled>Select Type</option>
+                  <option value="" disabled={types.length > 0}>{types.length > 0 ? "Select Type" : "Uncategorized"}</option>
                   {types.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.label}

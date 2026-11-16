@@ -87,9 +87,15 @@ La priorité effective combine la priorité, la motivation, la préférence pour
 
 L’export disponible dans les paramètres est un CSV. L’application ne propose actuellement pas de restauration de sauvegarde JSON.
 
+## Chargement et données initiales
+
+Un échec de lecture affiche un message bref avec la commande `Reload page`, sans présenter une fausse liste vide. Le rechargement relance la lecture des données existantes. Les échecs d'enregistrement conservent leurs messages et parcours de nouvelle tentative dans le formulaire ou l'action concernés.
+
+Les types Book, Movie, Series et Other sont créés à la première connexion. Une suppression reste enregistrée, y compris celle du dernier type ; les connexions suivantes ne reconstituent pas la liste. Les contenus d'un type supprimé sont réaffectés selon le choix existant ; lorsque le dernier type est supprimé, ils restent conservés avec la mention Uncategorized, sans créer un nouveau type. Il reste possible d'ajouter du contenu sans type quand la liste est vide. Une réinitialisation complète explicite restaure les types initiaux.
+
 ## Interface partagée
 
-L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.8, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. L’interface utilise Inter et des thèmes clair et sombre communs. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
+L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.9, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. L’interface utilise Inter et des thèmes clair et sombre communs. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
 
 L’archive est incluse dans [vendor/](vendor/) et référencée par `package.json` et `package-lock.json`. Ce dépôt est installable et déployable seul : aucun accès au dépôt source voisin `app-ui` ni à un registre privé n’est nécessaire. Relancer `npm ci` après un pull qui change les dépendances. La vérification du package partagé s’exécute automatiquement avant le build.
 

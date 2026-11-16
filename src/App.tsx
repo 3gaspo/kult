@@ -1,5 +1,5 @@
 import { ScreenBoundary } from './components/ScreenBoundary';
-import { StateFeedback } from './components/StateFeedback';
+import { StateFeedback, DataLoadError } from './components/StateFeedback';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -18,6 +18,7 @@ import { Home, Calendar, BarChart2, Settings as SettingsIcon, Film } from "lucid
 
 // Layout wrapper that renders the bottom navigation bar
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { loadError, dataLoading, settings } = useKult();
 
   const navigationTabs = [
     { name: "Home", path: "/home", icon: Home },
@@ -30,7 +31,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="app-shell bg-ui-page text-ui-text transition-colors duration-200">
       {/* Main content container with max-width for modern desktop layouts, but fluid for mobile */}
       <main className="app-page">
-        <ScreenBoundary><Suspense fallback={<StateFeedback kind="loading" />}>{children}</Suspense></ScreenBoundary>
+        <ScreenBoundary>{loadError ? <DataLoadError /> : dataLoading || !settings ? <StateFeedback kind="loading" /> : <Suspense fallback={<StateFeedback kind="loading" />}>{children}</Suspense>}</ScreenBoundary>
       </main>
 
       {/* Fixed bottom navigation */}
@@ -41,7 +42,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // Application Shell selector which manages Auth Loading states & Route redirection
 const AppContent: React.FC = () => {
-  const { user, authLoading } = useKult();
+  const { user, authLoading, loadError } = useKult();
+
+  if (!user && loadError) return <div className="app-page"><DataLoadError /></div>;
 
   if (authLoading) return <div className="min-h-screen bg-ui-page flex items-center justify-center"><StateFeedback kind="loading" /></div>;
 
@@ -69,10 +72,10 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <KultProvider>
+    <ScreenBoundary fallback={<div className="app-page"><DataLoadError /></div>}><KultProvider>
       <Router>
         <AppContent />
       </Router>
-    </KultProvider>
+    </KultProvider></ScreenBoundary>
   );
 }

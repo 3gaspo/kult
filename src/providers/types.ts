@@ -8,6 +8,7 @@ import { AuthUser, ContentItem, ContentType, UserSettings } from "../types";
 export interface IAuthProvider {
   user: AuthUser | null;
   loading: boolean;
+  loadError?: boolean;
   isFirebase: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;

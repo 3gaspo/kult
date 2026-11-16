@@ -25,6 +25,7 @@ interface IKultContext {
   types: ContentType[];
   settings: UserSettings | null;
   dataLoading: boolean;
+  loadError: boolean;
 
   // Data Actions
   addItem: (item: Omit<ContentItem, "userId" | "effectivePriority">) => Promise<void>;
@@ -60,6 +61,7 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [types, setTypes] = useState<ContentType[]>([]);
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [dataLoading, setDataLoading] = useState<boolean>(false);
+  const [loadError, setLoadError] = useState(false);
 
   // 4. Listen to Auth changes
   useEffect(() => {
@@ -117,8 +119,10 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSettings(fetchedSettings);
       setTypes(fetchedTypes);
       setItems(normalizedItems);
+      setLoadError(false);
     } catch (error) {
       console.error("Error loading Kult data:", error);
+      setLoadError(true);
     } finally {
       setDataLoading(false);
     }
@@ -132,6 +136,7 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setItems([]);
       setTypes([]);
       setSettings(null);
+      setLoadError(false);
       // Remove dark mode class if user logs out, default to light
       document.documentElement.classList.remove("dark");
     }
@@ -205,9 +210,9 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await dataProvider.deleteContentType(user.uid, typeId, reassignToId);
     setTypes((prev) => prev.filter((t) => t.id !== typeId));
     
-    if (reassignToId) {
+    if (reassignToId !== undefined) {
       const targetType = types.find((t) => t.id === reassignToId);
-      const label = targetType?.label || "Other";
+      const label = targetType?.label || "Uncategorized";
       setItems((prev) =>
         prev.map((item) =>
           item.typeId === typeId
@@ -268,6 +273,7 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
         types,
         settings,
         dataLoading,
+        loadError: loadError || Boolean(authProvider.loadError),
         addItem,
         updateItem,
         deleteItem,

@@ -46,6 +46,7 @@ function toFirestoreData<T>(obj: T): any {
 export class FirebaseAuthProvider implements IAuthProvider {
   user: AuthUser | null = null;
   loading: boolean = true;
+  loadError = false;
   isFirebase: boolean = true;
   private unsubscribeAuth: (() => void) | null = null;
   private listeners: (() => void)[] = [];
@@ -71,7 +72,7 @@ export class FirebaseAuthProvider implements IAuthProvider {
       }
       this.loading = false;
       this.notify();
-    });
+    }, () => { this.loadError = true; this.loading = false; this.notify(); });
   }
 
   onChange(listener: () => void) {
@@ -153,11 +154,15 @@ export class FirestoreDataProvider implements IDataProvider {
     try {
       const settingsSnap = await getDoc(doc(db, "users", userId, "settings", "main"));
       if (!settingsSnap.exists()) {
+        const [existingTypes, existingItems] = await Promise.all([
+          getDocs(collection(db, "users", userId, "contentTypes")),
+          getDocs(collection(db, "users", userId, "content")),
+        ]);
         const batch = writeBatch(db);
         const now = new Date().toISOString();
 
         // 1. Seed Content Types
-        DEFAULT_CONTENT_TYPES.forEach((t) => {
+        (existingTypes.empty && existingItems.empty ? DEFAULT_CONTENT_TYPES : []).forEach((t) => {
           const typeRef = doc(db, "users", userId, "contentTypes", t.id);
           batch.set(typeRef, {
             ...t,
@@ -271,13 +276,13 @@ export class FirestoreDataProvider implements IDataProvider {
     if (!db) return;
     const path = `users/${userId}/contentTypes/${typeId}`;
     try {
-      const batch = writeBatch(db);
+      const writes: ((batch: ReturnType<typeof writeBatch>) => void)[] = [];
       
       // 1. If reassignment requested, fetch all items of this type and update them
-      if (reassignToId) {
+      if (reassignToId !== undefined) {
         const types = await this.getContentTypes(userId);
         const targetType = types.find((t) => t.id === reassignToId);
-        const label = targetType?.label || "Other";
+        const label = targetType?.label || "Uncategorized";
         
         const q = query(
           collection(db, "users", userId, "content"),
@@ -285,19 +290,22 @@ export class FirestoreDataProvider implements IDataProvider {
         );
         const itemSnaps = await getDocs(q);
         itemSnaps.forEach((itemDoc) => {
-          batch.update(itemDoc.ref, {
+          writes.push(batch => batch.update(itemDoc.ref, {
             typeId: reassignToId,
             typeLabel: label,
             updatedAt: new Date().toISOString(),
-          });
+          }));
         });
       }
 
       // 2. Delete the content type itself
       const typeRef = doc(db, "users", userId, "contentTypes", typeId);
-      batch.delete(typeRef);
-
-      await batch.commit();
+      writes.push(batch => batch.delete(typeRef));
+      for (let offset = 0; offset < writes.length; offset += 400) {
+        const batch = writeBatch(db);
+        writes.slice(offset, offset + 400).forEach(write => write(batch));
+        await batch.commit();
+      }
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, path);
     }

@@ -124,9 +124,11 @@ export class LocalDataProvider implements IDataProvider {
     // Seed Content Types
     const typesKey = KEY_TYPES(userId);
     const existingTypes = localStorage.getItem(typesKey);
-    if (!existingTypes) {
+    // An existing account (including an intentionally empty list) is never reseeded.
+    if (existingTypes === null) {
       const now = new Date().toISOString();
-      const initialTypes: ContentType[] = DEFAULT_CONTENT_TYPES.map(t => ({
+      const firstConnection = localStorage.getItem(KEY_SETTINGS(userId)) === null && localStorage.getItem(KEY_ITEMS(userId)) === null;
+      const initialTypes: ContentType[] = (firstConnection ? DEFAULT_CONTENT_TYPES : []).map(t => ({
         ...t,
         createdAt: now,
         updatedAt: now
@@ -201,7 +203,7 @@ export class LocalDataProvider implements IDataProvider {
     localStorage.setItem(KEY_TYPES(userId), JSON.stringify(filtered));
 
     // Handle orphaned ContentItems
-    if (reassignToId) {
+    if (reassignToId !== undefined) {
       const items = await this.getContentItems(userId);
       const updatedItems = items.map(item => {
         if (item.typeId === typeId) {
@@ -209,7 +211,7 @@ export class LocalDataProvider implements IDataProvider {
           return {
             ...item,
             typeId: reassignToId,
-            typeLabel: reassignType?.label || "Other",
+            typeLabel: reassignType?.label || "Uncategorized",
             updatedAt: new Date().toISOString()
           };
         }
