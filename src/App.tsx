@@ -1,4 +1,5 @@
 import { ScreenBoundary } from './components/ScreenBoundary';
+import { TutorialProvider } from '@3gaspo/app-ui/Tutorial';
 import { StateFeedback, DataLoadError } from './components/StateFeedback';
 /**
  * @license
@@ -9,6 +10,7 @@ import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { KultProvider, useKult } from "./providers";
 import { HomePage } from "./pages/Home";
+import { tutorialPages } from './tutorial';
 const HistoryPage = lazy(() => import('./pages/History').then(module => ({ default: module.HistoryPage })));
 const StatisticsPage = lazy(() => import('./pages/Statistics').then(module => ({ default: module.StatisticsPage })));
 const SettingsPage = lazy(() => import('./pages/Settings').then(module => ({ default: module.SettingsPage })));
@@ -42,7 +44,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // Application Shell selector which manages Auth Loading states & Route redirection
 const AppContent: React.FC = () => {
-  const { user, authLoading, loadError } = useKult();
+  const { user, authLoading, dataLoading, loadError, settings } = useKult();
 
   if (!user && loadError) return <div className="app-page"><DataLoadError /></div>;
 
@@ -54,19 +56,21 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <Routes>
-      {/* Root redirect */}
-      <Route path="/" element={<Navigate to="/home" replace />} />
-      
-      {/* Protected Main Routes */}
-      <Route path="/home" element={<MainLayout><HomePage /></MainLayout>} />
-      <Route path="/history" element={<MainLayout><HistoryPage /></MainLayout>} />
-      <Route path="/stats" element={<MainLayout><StatisticsPage /></MainLayout>} />
-      <Route path="/settings" element={<MainLayout><SettingsPage /></MainLayout>} />
+    <TutorialProvider appName="Kult" accountId={user.uid} ready={!loadError && !dataLoading && !!settings} pages={tutorialPages}>
+      <Routes>
+        {/* Root redirect */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
-      {/* Fallback route */}
-      <Route path="*" element={<Navigate to="/home" replace />} />
-    </Routes>
+        {/* Protected Main Routes */}
+        <Route path="/home" element={<MainLayout><HomePage /></MainLayout>} />
+        <Route path="/history" element={<MainLayout><HistoryPage /></MainLayout>} />
+        <Route path="/stats" element={<MainLayout><StatisticsPage /></MainLayout>} />
+        <Route path="/settings" element={<MainLayout><SettingsPage /></MainLayout>} />
+
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/home" replace />} />
+      </Routes>
+    </TutorialProvider>
   );
 };
 

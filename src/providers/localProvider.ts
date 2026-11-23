@@ -4,6 +4,7 @@
  */
 
 import { AuthUser, ContentItem, ContentType, UserSettings, DEFAULT_FORMULA_WEIGHTS, DEFAULT_CONTENT_TYPES } from "../types";
+import { DEFAULT_THEME } from "@3gaspo/app-ui/themePreference";
 import { IAuthProvider, IDataProvider } from "./types";
 
 // Local storage key helper
@@ -141,7 +142,7 @@ export class LocalDataProvider implements IDataProvider {
     const existingSettings = localStorage.getItem(settingsKey);
     if (!existingSettings) {
       const defaultSettings: UserSettings = {
-        theme: "light",
+        theme: DEFAULT_THEME,
         defaultTypeId: "book",
         ...DEFAULT_FORMULA_WEIGHTS,
         initialized: true,
@@ -231,17 +232,17 @@ export class LocalDataProvider implements IDataProvider {
     if (data) {
       const parsed = JSON.parse(data);
       return {
-        theme: "light",
         defaultTypeId: "book",
         ...DEFAULT_FORMULA_WEIGHTS,
         ...parsed,
+        theme: parsed.theme ?? DEFAULT_THEME,
         hideCategoryScore: parsed.hideCategoryScore ?? true,
         hideOverallScore: parsed.hideOverallScore ?? true,
         initialized: true,
       };
     }
     const defaultSettings: UserSettings = {
-      theme: "light",
+      theme: DEFAULT_THEME,
       defaultTypeId: "book",
       hideCategoryScore: true,
       hideOverallScore: true,

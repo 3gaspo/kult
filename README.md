@@ -27,6 +27,8 @@ Les icônes utilisent un canevas de 512 × 512, un fond noir opaque et des forme
 
 La racine `/` redirige vers l’accueil. La connexion s’affiche lorsqu’aucune session n’est active. Les écrans secondaires sont chargés à la demande.
 
+Un tutoriel présente le but de l’app, puis les fonctions principales de ses quatre onglets avec leurs icônes. Il s’ouvre à la première visite de l’accueil après connexion et sa fermeture est mémorisée pour ce compte dans le navigateur. La section Help de Settings regroupe `View tutorial` et `Detailed functionalities`, qui ouvre un guide des parcours et des calculs de l’app.
+
 ## Stack et organisation
 
 React 19, TypeScript 5.8, Vite 6, Tailwind CSS 4, React Router, Lucide et Firebase Authentication / Firestore. Les graphiques sont des composants HTML/CSS propres à Kult.
@@ -93,9 +95,12 @@ Un échec de lecture affiche un message bref avec la commande `Reload page`, san
 
 Les types Book, Movie, Series et Other sont créés à la première connexion. Une suppression reste enregistrée, y compris celle du dernier type ; les connexions suivantes ne reconstituent pas la liste. Les contenus d'un type supprimé sont réaffectés selon le choix existant ; lorsque le dernier type est supprimé, ils restent conservés avec la mention Uncategorized, sans créer un nouveau type. Il reste possible d'ajouter du contenu sans type quand la liste est vide. Une réinitialisation complète explicite restaure les types initiaux.
 
+
+Les réglages immédiats signalent la progression et les échecs avec Retry. Les écritures sont ordonnées ; les champs de formule gardent leur saisie en cas d’échec et les modifications partielles préservent les autres préférences.
+
 ## Interface partagée
 
-L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.9, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. L’interface utilise Inter et des thèmes clair et sombre communs. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
+L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.12, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. Inter et Source Sans 3 sont hébergées avec l’application. Source Sans 3 sert au titre portant le nom de l’app, et Inter au reste de l’interface. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
 
 L’archive est incluse dans [vendor/](vendor/) et référencée par `package.json` et `package-lock.json`. Ce dépôt est installable et déployable seul : aucun accès au dépôt source voisin `app-ui` ni à un registre privé n’est nécessaire. Relancer `npm ci` après un pull qui change les dépendances. La vérification du package partagé s’exécute automatiquement avant le build.
 

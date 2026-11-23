@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { DEFAULT_THEME } from "@3gaspo/app-ui/themePreference";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -174,7 +175,7 @@ export class FirestoreDataProvider implements IDataProvider {
         // 2. Seed User Settings
         const settingsRef = doc(db, "users", userId, "settings", "main");
         const defaultSettings: UserSettings = {
-          theme: "light",
+          theme: DEFAULT_THEME,
           defaultTypeId: "book",
           hideCategoryScore: true,
           hideOverallScore: true,
@@ -329,7 +330,7 @@ export class FirestoreDataProvider implements IDataProvider {
   async getUserSettings(userId: string): Promise<UserSettings> {
     if (!db) {
       return {
-        theme: "light",
+        theme: DEFAULT_THEME,
         defaultTypeId: "book",
         hideCategoryScore: true,
         hideOverallScore: true,
@@ -344,17 +345,17 @@ export class FirestoreDataProvider implements IDataProvider {
       if (docSnap.exists()) {
         const data = docSnap.data();
         return {
-          theme: "light",
           defaultTypeId: "book",
           ...DEFAULT_FORMULA_WEIGHTS,
           ...data,
+          theme: data.theme ?? DEFAULT_THEME,
           hideCategoryScore: data.hideCategoryScore ?? true,
           hideOverallScore: data.hideOverallScore ?? true,
           initialized: true,
         } as UserSettings;
       }
       return {
-        theme: "light",
+        theme: DEFAULT_THEME,
         defaultTypeId: "book",
         hideCategoryScore: true,
         hideOverallScore: true,

@@ -178,7 +178,7 @@ export const HistoryPage: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className="ui-item-card bg-ui-surface p-5 rounded-2xl border border-ui-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
+                  className="ui-item-card ui-interactive-surface--actions bg-ui-surface p-5 rounded-2xl border border-ui-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   id={`completed-card-${item.id}`}
                 >
                   <div className="flex-1 min-w-0 space-y-2">

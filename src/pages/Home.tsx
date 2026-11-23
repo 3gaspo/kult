@@ -139,7 +139,7 @@ export const HomePage: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className={"ui-item-card " + (`bg-ui-surface p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                  className={"ui-item-card ui-interactive-surface--actions " + (`bg-ui-surface p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                     isOngoing
                       ? "border-amber-500/50 dark:border-amber-500/30 ring-2 ring-amber-500/10"
                       : "border-ui-border"

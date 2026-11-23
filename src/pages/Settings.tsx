@@ -1,4 +1,7 @@
 import { ActionButton } from '@3gaspo/app-ui/ActionButton';
+import { HelpSection } from '@3gaspo/app-ui/Tutorial';
+import { featureGuide } from '../featureGuide';
+import { SettingsSaveFeedback, useSettingsSave } from '@3gaspo/app-ui/SettingsSaveFeedback';
 import { ValidatedForm } from '../components/ValidatedForm';
 import { SettingsSwitch } from '../components/SettingsSwitch';
 import { PageHeader } from '../components/PageHeader';
@@ -53,10 +56,12 @@ export const SettingsPage: React.FC = () => {
     saveType,
     deleteType,
     saveTypesOrder,
-    saveSettings,
+    saveSettings: persistSettings,
     clearHistory,
     resetAllData,
   } = useKult();
+  const saves = useSettingsSave();
+  const saveSettings = (updates: Partial<UserSettings>, key = 'formula') => saves.save(() => persistSettings(updates), key);
 
   // 1. App-specific settings states
   const [newTypeLabel, setNewTypeLabel] = useState("");
@@ -114,7 +119,6 @@ export const SettingsPage: React.FC = () => {
 
     if (settings) {
       saveSettings({
-        ...settings,
         priorityWeight: total === 0 ? DEFAULT_FORMULA_WEIGHTS.priorityWeight : numP,
         pleasureWeight: total === 0 ? DEFAULT_FORMULA_WEIGHTS.pleasureWeight : numPl,
         shortnessWeight: total === 0 ? DEFAULT_FORMULA_WEIGHTS.shortnessWeight : numS,
@@ -275,19 +279,20 @@ export const SettingsPage: React.FC = () => {
 
   // Synchronize input fields with state when settings load
   React.useEffect(() => {
-    if (settings) {
+    if (settings && !saves.saving && !saves.error) {
       setPriorityW(settings.priorityWeight.toString());
       setPleasureW(settings.pleasureWeight.toString());
       setShortnessW(settings.shortnessWeight.toString());
       setFreshnessW(settings.freshnessWeight.toString());
       setBacklogW(settings.backlogWeight.toString());
     }
-  }, [settings]);
+  }, [settings?.priorityWeight, settings?.pleasureWeight, settings?.shortnessWeight, settings?.freshnessWeight, settings?.backlogWeight, saves.saving, saves.error]);
 
   return (
     <div className="space-y-6 pb-24 text-ui-text font-sans">
       {/* Header */}
       <PageHeader title="Settings" devMode={!isFirebase} titleId="settings-title" devModeId="dev-mode-badge" />
+      <SettingsSaveFeedback {...saves} />
 
       {/* 1. App-specific settings */}
       <div className="space-y-6">
@@ -416,7 +421,7 @@ export const SettingsPage: React.FC = () => {
             <div className="relative">
               <select
                 aria-label="Default category" value={settings.defaultTypeId || ""}
-                onChange={(e) => saveSettings({ ...settings, defaultTypeId: e.target.value })}
+                disabled={saves.saving} onChange={(e) => saveSettings({ defaultTypeId: e.target.value }, 'defaultType')}
                 className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-surface border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white appearance-none text-sm font-bold shadow-sm"
                 id="settings-default-type-select"
               >
@@ -451,12 +456,11 @@ export const SettingsPage: React.FC = () => {
                   Hide score per category
                 </div>
               </div>
-              <SettingsSwitch checked={settings.hideCategoryScore ?? true} onClick={() => {
+              <SettingsSwitch checked={settings.hideCategoryScore ?? true} disabled={saves.saving} onClick={() => {
                   const current = settings.hideCategoryScore ?? true;
                   saveSettings({
-                    ...settings,
                     hideCategoryScore: !current,
-                  });
+                  }, 'categoryScore');
                 }} label="Hide score per category" id="toggle-hide-category-score" />
             </div>
 
@@ -467,12 +471,11 @@ export const SettingsPage: React.FC = () => {
                   Hide overall score
                 </div>
               </div>
-              <SettingsSwitch checked={settings.hideOverallScore ?? true} onClick={() => {
+              <SettingsSwitch checked={settings.hideOverallScore ?? true} disabled={saves.saving} onClick={() => {
                   const current = settings.hideOverallScore ?? true;
                   saveSettings({
-                    ...settings,
                     hideOverallScore: !current,
-                  });
+                  }, 'overallScore');
                 }} label="Hide overall score" id="toggle-hide-overall-score" />
             </div>
           </div>
@@ -490,7 +493,7 @@ export const SettingsPage: React.FC = () => {
 
           <div className="ui-setting-row ui-item-card flex justify-between items-center bg-ui-surface p-5 rounded-2xl border border-ui-border shadow-sm font-bold text-sm">
             <span className="text-ui-ink/70">Dark Mode</span>
-            <SettingsSwitch checked={settings.theme === "dark"} onClick={() => saveSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" })} label="Dark Mode" id="theme-toggle-switch" />
+            <SettingsSwitch checked={settings.theme === "dark"} disabled={saves.saving} onClick={() => saveSettings({ theme: settings.theme === "dark" ? "light" : "dark" }, 'theme')} label="Dark Mode" id="theme-toggle-switch" />
           </div>
         </div>
       )}
@@ -592,6 +595,8 @@ export const SettingsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      <HelpSection appName="Kult" sections={featureGuide} />
 
       {/* 4. Actions */}
       <div className="space-y-3" id="settings-actions">

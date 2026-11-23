@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
+import { DEFAULT_THEME } from "@3gaspo/app-ui/themePreference";
 import { AuthUser, ContentItem, ContentType, UserSettings, DEFAULT_FORMULA_WEIGHTS } from "../types";
 import { IAuthProvider, IDataProvider } from "./types";
 import { firebaseReady } from "./firebaseService";
@@ -34,7 +35,7 @@ interface IKultContext {
   saveType: (type: ContentType) => Promise<void>;
   deleteType: (typeId: string, reassignToId?: string) => Promise<void>;
   saveTypesOrder: (types: ContentType[]) => Promise<void>;
-  saveSettings: (settings: UserSettings) => Promise<void>;
+  saveSettings: (settings: Partial<UserSettings>) => Promise<void>;
   clearHistory: () => Promise<void>;
   resetAllData: () => Promise<void>;
   refreshData: () => Promise<void>;
@@ -60,6 +61,8 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [items, setItems] = useState<ContentItem[]>([]);
   const [types, setTypes] = useState<ContentType[]>([]);
   const [settings, setSettings] = useState<UserSettings | null>(null);
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
   const [dataLoading, setDataLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState(false);
 
@@ -137,8 +140,7 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setTypes([]);
       setSettings(null);
       setLoadError(false);
-      // Remove dark mode class if user logs out, default to light
-      document.documentElement.classList.remove("dark");
+      applyTheme(DEFAULT_THEME);
     }
   }, [user]);
 
@@ -229,9 +231,11 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTypes(reorderedTypes);
   };
 
-  const saveSettings = async (newSettings: UserSettings) => {
-    if (!user) return;
+  const saveSettings = async (updates: Partial<UserSettings>) => {
+    if (!user || !settingsRef.current) return;
+    const newSettings = { ...settingsRef.current, ...updates };
     await dataProvider.saveUserSettings(user.uid, newSettings);
+    settingsRef.current = newSettings;
     
     // Apply theme immediately
     applyTheme(newSettings.theme);
