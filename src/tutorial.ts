@@ -12,8 +12,8 @@ export const tutorialPages = [
     title: 'Home',
     actions: [
       { icon: Plus, text: 'Add a book, film or series', primary: true },
-      { icon: Play, text: 'Start an item from your ranked list' },
-      { icon: CheckCircle2, text: 'Mark an item as finished' },
+      { icon: Play, text: 'Start an item from your list' },
+      { icon: CheckCircle2, text: 'Mark an item finished' },
     ],
   },
   {
@@ -22,14 +22,14 @@ export const tutorialPages = [
     actions: [
       { icon: Search, text: 'Find finished items' },
       { icon: Edit3, text: 'Edit an item’s details' },
-      { icon: RefreshCcw, text: 'Move an item to Backlog or Ongoing' },
+      { icon: RefreshCcw, text: 'Reopen to Backlog or Ongoing' },
     ],
   },
   {
     icon: BarChart2,
     title: 'Statistics',
     actions: [
-      { icon: Activity, text: 'See what you finish each month' },
+      { icon: Activity, text: 'See monthly completions' },
       { icon: ChevronDown, text: 'Filter by type or year' },
     ],
   },
@@ -37,8 +37,8 @@ export const tutorialPages = [
     icon: Settings,
     title: 'Settings',
     actions: [
-      { icon: Plus, text: 'Add and manage content types' },
-      { icon: Flame, text: 'Adjust how priority is calculated' },
+      { icon: Plus, text: 'Manage content types' },
+      { icon: Flame, text: 'Change priority weights' },
       { icon: Download, text: 'Export your list as CSV' },
     ],
   },

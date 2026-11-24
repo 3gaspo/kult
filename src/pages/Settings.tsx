@@ -5,6 +5,7 @@ import { SettingsSaveFeedback, useSettingsSave } from '@3gaspo/app-ui/SettingsSa
 import { ValidatedForm } from '../components/ValidatedForm';
 import { SettingsSwitch } from '../components/SettingsSwitch';
 import { PageHeader } from '../components/PageHeader';
+import packageJson from '../../package.json';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -40,7 +41,6 @@ import {
 
 // Constants requested by user
 const SUPPORT_URL = "https://ko-fi.com/3gaspo";
-const APP_VERSION = "0.0.1"; // Corresponds to package.json version
 
 export const SettingsPage: React.FC = () => {
   const {
@@ -680,7 +680,7 @@ export const SettingsPage: React.FC = () => {
         {/* Credits Details */}
         <div className="space-y-2 flex flex-col items-center">
           <span className="bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
-            Kult — version {APP_VERSION}
+            Kult — version {packageJson.version}
           </span>
           <p className="text-ui-text font-black text-sm tracking-tight mt-1">
             GASPARD BERTHELIER
