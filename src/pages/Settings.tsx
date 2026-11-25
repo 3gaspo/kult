@@ -1,4 +1,5 @@
 import { ActionButton } from '@3gaspo/app-ui/ActionButton';
+import { SettingsDisclosure } from '@3gaspo/app-ui/SettingsDisclosure';
 import { HelpSection } from '@3gaspo/app-ui/Tutorial';
 import { featureGuide } from '../featureGuide';
 import { SettingsSaveFeedback, useSettingsSave } from '@3gaspo/app-ui/SettingsSaveFeedback';
@@ -298,13 +299,7 @@ export const SettingsPage: React.FC = () => {
       <div className="space-y-6">
         
         {/* Content Types section */}
-        <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
-          <div>
-            <span className="ui-section-title text-[10px] uppercase font-black tracking-widest text-ui-muted">
-              Content Types
-            </span>
-          </div>
-
+        <SettingsDisclosure label="Content Types">
           {/* Add Category Form */}
           <ValidatedForm onSubmit={handleAddType} className="flex gap-2">
             <input
@@ -362,7 +357,7 @@ export const SettingsPage: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        </SettingsDisclosure>
 
         {/* Priority Formula section */}
         <div className="ui-section-card bg-ui-section p-6 sm:p-8 rounded-[32px] space-y-6 transition-colors duration-200">
