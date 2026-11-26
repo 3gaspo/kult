@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { appStorage, guestUser, isGuestSession } from '@3gaspo/app-ui/guestSession';
 import { AuthUser, ContentItem, ContentType, UserSettings, DEFAULT_FORMULA_WEIGHTS, DEFAULT_CONTENT_TYPES } from "../types";
 import { DEFAULT_THEME } from "@3gaspo/app-ui/themePreference";
 import { IAuthProvider, IDataProvider } from "./types";
@@ -25,7 +26,12 @@ export class LocalAuthProvider implements IAuthProvider {
   }
 
   private init() {
-    const saved = localStorage.getItem(KEY_CURRENT_USER);
+    if (isGuestSession) {
+      this.user = guestUser;
+      this.loading = false;
+      return;
+    }
+    const saved = appStorage.getItem(KEY_CURRENT_USER);
     if (saved) {
       try {
         this.user = JSON.parse(saved);
@@ -36,13 +42,13 @@ export class LocalAuthProvider implements IAuthProvider {
       // Auto-initialize a default dev user if none exists
       const devUser = { uid: "dev_user_123", email: "dev@kult.app" };
       this.user = devUser;
-      localStorage.setItem(KEY_CURRENT_USER, JSON.stringify(devUser));
+      appStorage.setItem(KEY_CURRENT_USER, JSON.stringify(devUser));
       
       // Register this user locally as well
       const users = this.getRegisteredUsers();
       if (!users["dev@kult.app"]) {
         users["dev@kult.app"] = { password: "password", uid: "dev_user_123" };
-        localStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
+        appStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
       }
     }
     this.loading = false;
@@ -51,7 +57,7 @@ export class LocalAuthProvider implements IAuthProvider {
 
   private getRegisteredUsers(): Record<string, { password: string; uid: string }> {
     try {
-      const data = localStorage.getItem(KEY_LOCAL_USERS);
+      const data = appStorage.getItem(KEY_LOCAL_USERS);
       return data ? JSON.parse(data) : {};
     } catch {
       return {};
@@ -79,11 +85,11 @@ export class LocalAuthProvider implements IAuthProvider {
         const uid = "user_" + Math.random().toString(36).substr(2, 9);
         found = { password, uid };
         users[cleanEmail] = found;
-        localStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
+        appStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
       } else {
         found.password = password;
         users[cleanEmail] = found;
-        localStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
+        appStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
       }
     }
 
@@ -92,7 +98,7 @@ export class LocalAuthProvider implements IAuthProvider {
     }
     const loggedUser: AuthUser = { uid: found.uid, email: cleanEmail };
     this.user = loggedUser;
-    localStorage.setItem(KEY_CURRENT_USER, JSON.stringify(loggedUser));
+    appStorage.setItem(KEY_CURRENT_USER, JSON.stringify(loggedUser));
     this.notify();
   }
 
@@ -104,17 +110,17 @@ export class LocalAuthProvider implements IAuthProvider {
     }
     const uid = "user_" + Math.random().toString(36).substr(2, 9);
     users[cleanEmail] = { password, uid };
-    localStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
+    appStorage.setItem(KEY_LOCAL_USERS, JSON.stringify(users));
 
     const loggedUser: AuthUser = { uid, email: cleanEmail };
     this.user = loggedUser;
-    localStorage.setItem(KEY_CURRENT_USER, JSON.stringify(loggedUser));
+    appStorage.setItem(KEY_CURRENT_USER, JSON.stringify(loggedUser));
     this.notify();
   }
 
   async signOut(): Promise<void> {
     this.user = null;
-    localStorage.removeItem(KEY_CURRENT_USER);
+    appStorage.removeItem(KEY_CURRENT_USER);
     this.notify();
   }
 }
@@ -124,22 +130,22 @@ export class LocalDataProvider implements IDataProvider {
   private seedIfNeeded(userId: string) {
     // Seed Content Types
     const typesKey = KEY_TYPES(userId);
-    const existingTypes = localStorage.getItem(typesKey);
+    const existingTypes = appStorage.getItem(typesKey);
     // An existing account (including an intentionally empty list) is never reseeded.
     if (existingTypes === null) {
       const now = new Date().toISOString();
-      const firstConnection = localStorage.getItem(KEY_SETTINGS(userId)) === null && localStorage.getItem(KEY_ITEMS(userId)) === null;
+      const firstConnection = appStorage.getItem(KEY_SETTINGS(userId)) === null && appStorage.getItem(KEY_ITEMS(userId)) === null;
       const initialTypes: ContentType[] = (firstConnection ? DEFAULT_CONTENT_TYPES : []).map(t => ({
         ...t,
         createdAt: now,
         updatedAt: now
       }));
-      localStorage.setItem(typesKey, JSON.stringify(initialTypes));
+      appStorage.setItem(typesKey, JSON.stringify(initialTypes));
     }
 
     // Seed Settings
     const settingsKey = KEY_SETTINGS(userId);
-    const existingSettings = localStorage.getItem(settingsKey);
+    const existingSettings = appStorage.getItem(settingsKey);
     if (!existingSettings) {
       const defaultSettings: UserSettings = {
         theme: DEFAULT_THEME,
@@ -147,13 +153,13 @@ export class LocalDataProvider implements IDataProvider {
         ...DEFAULT_FORMULA_WEIGHTS,
         initialized: true,
       };
-      localStorage.setItem(settingsKey, JSON.stringify(defaultSettings));
+      appStorage.setItem(settingsKey, JSON.stringify(defaultSettings));
     }
   }
 
   async getContentItems(userId: string): Promise<ContentItem[]> {
     this.seedIfNeeded(userId);
-    const data = localStorage.getItem(KEY_ITEMS(userId));
+    const data = appStorage.getItem(KEY_ITEMS(userId));
     return data ? JSON.parse(data) : [];
   }
 
@@ -161,7 +167,7 @@ export class LocalDataProvider implements IDataProvider {
     const items = await this.getContentItems(userId);
     const newItem: ContentItem = { ...item, userId };
     items.push(newItem);
-    localStorage.setItem(KEY_ITEMS(userId), JSON.stringify(items));
+    appStorage.setItem(KEY_ITEMS(userId), JSON.stringify(items));
   }
 
   async updateContentItem(userId: string, itemId: string, item: Partial<ContentItem>): Promise<void> {
@@ -169,19 +175,19 @@ export class LocalDataProvider implements IDataProvider {
     const index = items.findIndex(i => i.id === itemId);
     if (index !== -1) {
       items[index] = { ...items[index], ...item, updatedAt: new Date().toISOString() };
-      localStorage.setItem(KEY_ITEMS(userId), JSON.stringify(items));
+      appStorage.setItem(KEY_ITEMS(userId), JSON.stringify(items));
     }
   }
 
   async deleteContentItem(userId: string, itemId: string): Promise<void> {
     const items = await this.getContentItems(userId);
     const filtered = items.filter(i => i.id !== itemId);
-    localStorage.setItem(KEY_ITEMS(userId), JSON.stringify(filtered));
+    appStorage.setItem(KEY_ITEMS(userId), JSON.stringify(filtered));
   }
 
   async getContentTypes(userId: string): Promise<ContentType[]> {
     this.seedIfNeeded(userId);
-    const data = localStorage.getItem(KEY_TYPES(userId));
+    const data = appStorage.getItem(KEY_TYPES(userId));
     if (!data) return [];
     const parsed: ContentType[] = JSON.parse(data);
     return parsed.sort((a, b) => a.order - b.order);
@@ -195,13 +201,13 @@ export class LocalDataProvider implements IDataProvider {
     } else {
       types.push(type);
     }
-    localStorage.setItem(KEY_TYPES(userId), JSON.stringify(types));
+    appStorage.setItem(KEY_TYPES(userId), JSON.stringify(types));
   }
 
   async deleteContentType(userId: string, typeId: string, reassignToId?: string): Promise<void> {
     const types = await this.getContentTypes(userId);
     const filtered = types.filter(t => t.id !== typeId);
-    localStorage.setItem(KEY_TYPES(userId), JSON.stringify(filtered));
+    appStorage.setItem(KEY_TYPES(userId), JSON.stringify(filtered));
 
     // Handle orphaned ContentItems
     if (reassignToId !== undefined) {
@@ -218,17 +224,17 @@ export class LocalDataProvider implements IDataProvider {
         }
         return item;
       });
-      localStorage.setItem(KEY_ITEMS(userId), JSON.stringify(updatedItems));
+      appStorage.setItem(KEY_ITEMS(userId), JSON.stringify(updatedItems));
     }
   }
 
   async saveContentTypesOrder(userId: string, types: ContentType[]): Promise<void> {
-    localStorage.setItem(KEY_TYPES(userId), JSON.stringify(types));
+    appStorage.setItem(KEY_TYPES(userId), JSON.stringify(types));
   }
 
   async getUserSettings(userId: string): Promise<UserSettings> {
     this.seedIfNeeded(userId);
-    const data = localStorage.getItem(KEY_SETTINGS(userId));
+    const data = appStorage.getItem(KEY_SETTINGS(userId));
     if (data) {
       const parsed = JSON.parse(data);
       return {
@@ -253,20 +259,20 @@ export class LocalDataProvider implements IDataProvider {
   }
 
   async saveUserSettings(userId: string, settings: UserSettings): Promise<void> {
-    localStorage.setItem(KEY_SETTINGS(userId), JSON.stringify(settings));
+    appStorage.setItem(KEY_SETTINGS(userId), JSON.stringify(settings));
   }
 
   async clearHistory(userId: string): Promise<void> {
     const items = await this.getContentItems(userId);
     // Delete only historical completed content records
     const filtered = items.filter(i => i.status !== "completed");
-    localStorage.setItem(KEY_ITEMS(userId), JSON.stringify(filtered));
+    appStorage.setItem(KEY_ITEMS(userId), JSON.stringify(filtered));
   }
 
   async resetAllData(userId: string): Promise<void> {
-    localStorage.removeItem(KEY_ITEMS(userId));
-    localStorage.removeItem(KEY_TYPES(userId));
-    localStorage.removeItem(KEY_SETTINGS(userId));
+    appStorage.removeItem(KEY_ITEMS(userId));
+    appStorage.removeItem(KEY_TYPES(userId));
+    appStorage.removeItem(KEY_SETTINGS(userId));
     this.seedIfNeeded(userId);
   }
 }

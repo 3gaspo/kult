@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { isGuestSession } from '@3gaspo/app-ui/guestSession';
 import { initializeApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
 
 export const firebaseReady =
+  !isGuestSession &&
   !!import.meta.env.VITE_FIREBASE_API_KEY &&
   !!import.meta.env.VITE_FIREBASE_AUTH_DOMAIN &&
   !!import.meta.env.VITE_FIREBASE_PROJECT_ID &&

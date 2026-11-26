@@ -1,3 +1,5 @@
+import { GuestAccount } from '@3gaspo/app-ui/GuestAccount';
+import { isGuestSession } from '@3gaspo/app-ui/guestSession';
 import { ActionButton } from '@3gaspo/app-ui/ActionButton';
 import { SettingsDisclosure } from '@3gaspo/app-ui/SettingsDisclosure';
 import { HelpSection } from '@3gaspo/app-ui/Tutorial';
@@ -292,7 +294,7 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-24 text-ui-text font-sans">
       {/* Header */}
-      <PageHeader title="Settings" devMode={!isFirebase} titleId="settings-title" devModeId="dev-mode-badge" />
+      <PageHeader title="Settings" devMode={!isFirebase && !isGuestSession} titleId="settings-title" devModeId="dev-mode-badge" />
       <SettingsSaveFeedback {...saves} />
 
       {/* 1. App-specific settings */}
@@ -494,7 +496,7 @@ export const SettingsPage: React.FC = () => {
       )}
 
       {/* 3. Account */}
-      <div id="settings-account">
+      {isGuestSession ? <GuestAccount /> : <div id="settings-account">
         {!user ? (
           /* Signed Out card */
           <div className="ui-section-card bg-ui-section p-8 rounded-[32px] space-y-6 transition-colors duration-200">
@@ -589,7 +591,7 @@ export const SettingsPage: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
       <HelpSection appName="Kult" sections={featureGuide} />
 
@@ -600,7 +602,7 @@ export const SettingsPage: React.FC = () => {
         </span>
 
         {/* 1. Disconnect / Sign out */}
-        {user && (
+        {user && !isGuestSession && (
           <button
             onClick={signOut}
             className="ui-setting-action ui-setting-action--simple w-full text-left p-6 rounded-[24px] bg-ui-section hover:bg-black/10 dark:hover:bg-white/10 flex items-center gap-4 transition-all font-bold text-sm shadow-sm"

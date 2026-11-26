@@ -19,6 +19,7 @@ interface IKultContext {
   isFirebase: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
+  resetPassword?: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 
   // Data State
@@ -272,6 +273,7 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isFirebase: authProvider.isFirebase,
         signIn,
         signUp,
+        resetPassword: authProvider.resetPassword,
         signOut,
         items,
         types,

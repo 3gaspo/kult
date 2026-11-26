@@ -7,6 +7,7 @@ import { DEFAULT_THEME } from "@3gaspo/app-ui/themePreference";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut as fbSignOut,
   onAuthStateChanged,
   User as FirebaseUser,
@@ -139,6 +140,11 @@ export class FirebaseAuthProvider implements IAuthProvider {
     if (!auth) return;
     await fbSignOut(auth);
   }
+
+  resetPassword = async (email: string) => {
+    if (!auth) throw new Error('Firebase Auth is not available');
+    await sendPasswordResetEmail(auth, email);
+  };
 
   destroy() {
     if (this.unsubscribeAuth) {
