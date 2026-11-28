@@ -25,6 +25,8 @@ Les icônes utilisent un canevas de 512 × 512, un fond noir opaque et des forme
 | `/stats` | Statistics |
 | `/settings` | Settings : types, formule, affichage, thème, compte et export |
 
+Dans Settings, ouvrez le volet `Content Types`, fermé par défaut, pour afficher et gérer les types de contenu.
+
 La racine `/` redirige vers l’accueil. La connexion s’affiche lorsqu’aucune session n’est active. Les écrans secondaires sont chargés à la demande.
 
 Un tutoriel présente le but de l’app, puis les fonctions principales de ses quatre onglets avec leurs icônes. Il s’ouvre à la première visite de l’accueil après connexion et sa fermeture est mémorisée pour ce compte dans le navigateur. La section Help de Settings regroupe `View tutorial` et `Detailed functionalities`, qui ouvre un guide des parcours et des calculs de l’app.
@@ -57,6 +59,10 @@ Sans configuration Firebase complète, Kult utilise des fournisseurs locaux et u
 
 Le mode local conserve ses données dans le `localStorage` du navigateur, sans synchronisation entre appareils. Sa session de développement n’est pas une authentification distante. Changer de mode de stockage ne transfère pas automatiquement ces données.
 
+Avec Firebase, `Forgot password?` envoie un lien de réinitialisation à l’adresse saisie. Le formulaire indique qu’une adresse est inconnue si Firebase le signale. Lorsque Firebase protège l’existence des comptes, l’accusé de réception reste générique.
+
+`Continue as guest` ouvre une session de test sans compte. Les données et réglages invités restent dans le `sessionStorage` de l’onglet, sans écriture dans Firestore. Ils sont conservés au rechargement et effacés à la fermeture de l’onglet ou après confirmation avec `End guest session` dans Settings.
+
 Pour utiliser Firebase, copier [.env.example](.env.example) vers `.env.local` et renseigner la configuration de l’application web :
 
 ```dotenv
@@ -69,6 +75,8 @@ VITE_FIREBASE_APP_ID=
 ```
 
 Activer l’authentification email/mot de passe et Firestore dans le projet Firebase concerné. Ces variables sont lues par Vite au démarrage et lors du build : redémarrer le serveur ou reconstruire après une modification. Conserver les fichiers d’environnement locaux hors Git.
+
+Dans Firebase Console → Authentication → Templates → Password reset, renseigner `Kult` dans le champ `Sender name`. [Paramètres du modèle Firebase](https://docs.cloud.google.com/identity-platform/docs/reference/rest/v2/Config#EmailTemplate)
 
 ## Commandes et validation
 
@@ -100,7 +108,7 @@ Les réglages immédiats signalent la progression et les échecs avec Retry. Les
 
 ## Interface partagée
 
-L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.12, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. Inter et Source Sans 3 sont hébergées avec l’application. Source Sans 3 sert au titre portant le nom de l’app, et Inter au reste de l’interface. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
+L’application utilise `@3gaspo/app-ui`, actuellement en version 0.1.23, pour la navigation, les titres, dialogues, formulaires, commandes, retours d’état et formats visibles. Inter et Source Sans 3 sont hébergées avec l’application. Source Sans 3 sert au titre portant le nom de l’app, et Inter au reste de l’interface. Les dates affichées utilisent `en-GB` et les heures le format 24 h ; les formats de stockage et d’export restent propres à l’application.
 
 L’archive est incluse dans [vendor/](vendor/) et référencée par `package.json` et `package-lock.json`. Ce dépôt est installable et déployable seul : aucun accès au dépôt source voisin `app-ui` ni à un registre privé n’est nécessaire. Relancer `npm ci` après un pull qui change les dépendances. La vérification du package partagé s’exécute automatiquement avant le build.
 
@@ -118,3 +126,9 @@ firebase deploy --only hosting
 ```
 
 Ajouter `--project ID_DU_PROJET` si aucun projet n’est sélectionné. Un `firebase deploy` sans restriction peut aussi publier les règles et index Firestore déclarés. Un retour à une version conservée dans l’historique Firebase Hosting restaure le site, pas les données.
+
+## Corrections du 28 novembre 2026
+
+L’accueil propose Uncategorized tant que des contenus en attente ou en cours sont conservés sans type, même après la création d’un nouveau type. Ce filtre ne crée aucun type en stockage. Les champs du formulaire de contenu sont associés à leurs libellés.
+
+`Uncategorized` est un regroupement virtuel, visible uniquement lorsqu'il contient des entrées. Il n'apparaît pas dans la gestion des catégories/types et ne peut pas y être créé, modifié ou supprimé. Les anciennes références restent conservées.

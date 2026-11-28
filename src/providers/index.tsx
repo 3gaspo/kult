@@ -194,6 +194,7 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const saveType = async (type: ContentType) => {
+    if (!type.id || type.label.trim().toLowerCase() === 'uncategorized') throw new Error('Uncategorized is reserved for entries without a type.');
     if (!user) return;
     await dataProvider.saveContentType(user.uid, type);
     setTypes((prev) => {
@@ -265,6 +266,11 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await refreshData();
   };
 
+  const virtualTypeIds = new Set(types.filter(type => type.label.trim().toLowerCase() === 'uncategorized').map(type => type.id));
+  const visibleTypes = types.filter(type => !virtualTypeIds.has(type.id));
+  const visibleItems = items.map(item => !item.typeId || virtualTypeIds.has(item.typeId)
+    ? { ...item, typeId: '', typeLabel: 'Uncategorized' } : item);
+
   return (
     <KultContext.Provider
       value={{
@@ -275,8 +281,8 @@ export const KultProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         resetPassword: authProvider.resetPassword,
         signOut,
-        items,
-        types,
+        items: visibleItems,
+        types: visibleTypes,
         settings,
         dataLoading,
         loadError: loadError || Boolean(authProvider.loadError),

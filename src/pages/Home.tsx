@@ -17,20 +17,23 @@ export const HomePage: React.FC = () => {
   const { items, types, settings, updateItem, dataLoading } = useKult();
   
   // Tab states
-  const [selectedTypeId, setSelectedTypeId] = useState<string>("");
+  const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
 
-  // Initialize selectedTypeId when types load
+  const hasUncategorized = items.some(item => !item.typeId && item.status !== "completed");
+  const availableTypes = useMemo(() => hasUncategorized
+    ? [...types, { id: "", label: "Uncategorized" }]
+    : types, [types, hasUncategorized]);
+
+  // Keep the selection when it is still available, otherwise choose a valid fallback.
   useEffect(() => {
-    if (types.length > 0) {
-      if (settings?.defaultTypeId && types.some((t) => t.id === settings.defaultTypeId)) {
-        setSelectedTypeId(settings.defaultTypeId);
-      } else {
-        setSelectedTypeId(types[0].id);
-      }
-    }
-  }, [types, settings]);
+    setSelectedTypeId(current => {
+      if (availableTypes.some(type => type.id === current)) return current;
+      return availableTypes.find(type => type.id === settings?.defaultTypeId)?.id
+        ?? availableTypes[0]?.id ?? "";
+    });
+  }, [availableTypes, settings?.defaultTypeId]);
 
   // Filter items: only status "to_complete" and "ongoing" and matches typeId
   const filteredItems = useMemo(() => {
@@ -44,8 +47,8 @@ export const HomePage: React.FC = () => {
   }, [items, selectedTypeId]);
 
   const selectedTypeLabel = useMemo(() => {
-    return types.find((t) => t.id === selectedTypeId)?.label || "";
-  }, [types, selectedTypeId]);
+    return availableTypes.find((t) => t.id === selectedTypeId)?.label || "";
+  }, [availableTypes, selectedTypeId]);
 
   const isCategoryScoreHidden = settings?.hideCategoryScore !== false;
 
@@ -91,9 +94,9 @@ export const HomePage: React.FC = () => {
       </header>
 
       {/* Chip selector for Content Types */}
-      {types.length > 0 && (
+      {availableTypes.length > 0 && (
         <div className="ui-chips overflow-x-auto -mx-4 px-4 pb-2 scrollbar-none flex gap-2" id="type-chip-selector">
-          {types.map((t) => {
+          {availableTypes.map((t) => {
             const isActive = t.id === selectedTypeId;
             return (
               <ActionButton

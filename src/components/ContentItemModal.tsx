@@ -103,7 +103,7 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
       setError("Title is required.");
       return;
     }
-    if (!typeId && types.length > 0) {
+    if (!typeId && types.length > 0 && !(itemToEdit && !itemToEdit.typeId)) {
       setError("Please select a content type.");
       return;
     }
@@ -172,16 +172,15 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
 
           {/* Title Input */}
           <div className="space-y-2">
-            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+            <label htmlFor={formId + "-field-1"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Title
             </label>
-            <input
+            <input id={formId + "-field-1"}
               type="text"
               placeholder="What's the title?"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
-              id="modal-title-input"
               required
             />
           </div>
@@ -189,18 +188,17 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
           {/* Type and Status in Row */}
           <div className="ui-filter-grid">
             <div className="space-y-2">
-              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+              <label htmlFor={formId + "-field-2"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Type
               </label>
               <div className="relative">
-                <select
+                <select id={formId + "-field-2"}
                   value={typeId}
                   onChange={(e) => setTypeId(e.target.value)}
                   className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all appearance-none text-base shadow-sm font-medium"
-                  id="modal-type-select"
-                  required={types.length > 0}
+                  required={types.length > 0 && !(itemToEdit && !itemToEdit.typeId)}
                 >
-                  <option value="" disabled={types.length > 0}>{types.length > 0 ? "Select Type" : "Uncategorized"}</option>
+                  <option value="" disabled={types.length > 0 && !(itemToEdit && !itemToEdit.typeId)}>{itemToEdit && !itemToEdit.typeId ? "Uncategorized" : "Select Type"}</option>
                   {types.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.label}
@@ -214,15 +212,14 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
             </div>
 
             <div className="space-y-2">
-              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+              <label htmlFor={formId + "-field-3"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Status
               </label>
               <div className="relative">
-                <select
+                <select id={formId + "-field-3"}
                   value={status}
                   onChange={(e) => setStatus(e.target.value as any)}
                   className="ui-field ui-field-trailing w-full pl-4 pr-10 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all appearance-none text-base shadow-sm font-medium"
-                  id="modal-status-select"
                 >
                   <option value="to_complete">To Complete</option>
                   <option value="ongoing">Ongoing</option>
@@ -237,45 +234,42 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
 
           {/* Author / Creator */}
           <div className="space-y-2">
-            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+            <label htmlFor={formId + "-field-4"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Author / Creator
             </label>
-            <input
+            <input id={formId + "-field-4"}
               type="text"
               placeholder="e.g. Christopher Nolan, Haruki Murakami"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
-              id="modal-author-input"
             />
           </div>
 
           {/* Published and Added Dates */}
           <div className="ui-filter-grid">
             <div className="space-y-2">
-              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+              <label htmlFor={formId + "-field-5"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Release Date / Year
               </label>
-              <input
+              <input id={formId + "-field-5"}
                 type="text"
                 placeholder="e.g. 2024 or 2024-05-15"
                 value={publishedDate}
                 onChange={(e) => setPublishedDate(e.target.value)}
                 className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
-                id="modal-pubdate-input"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+              <label htmlFor={formId + "-field-6"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Added Date
               </label>
-              <input
+              <input id={formId + "-field-6"}
                 type="date"
                 value={addedDate}
                 onChange={(e) => setAddedDate(e.target.value)}
                 className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
-                id="modal-addeddate-input"
               />
             </div>
           </div>
@@ -283,15 +277,14 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
           {/* Completed Date (Only visible when status is completed) */}
           {status === "completed" && (
             <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
-              <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+              <label htmlFor={formId + "-field-7"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
                 Completed Date
               </label>
-              <input
+              <input id={formId + "-field-7"}
                 type="date"
                 value={completedDate}
                 onChange={(e) => setCompletedDate(e.target.value)}
                 className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
-                id="modal-completeddate-input"
               />
             </div>
           )}
@@ -373,31 +366,29 @@ export const ContentItemModal: React.FC<ContentItemModalProps> = ({
 
           {/* Keywords Input */}
           <div className="space-y-2">
-            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+            <label htmlFor={formId + "-field-8"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Keywords (comma-separated)
             </label>
-            <input
+            <input id={formId + "-field-8"}
               type="text"
               placeholder="e.g. sci-fi, classics, drama, philosophy"
               value={keywordsStr}
               onChange={(e) => setKeywordsStr(e.target.value)}
               className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
-              id="modal-keywords-input"
             />
           </div>
 
           {/* Note Textarea */}
           <div className="space-y-2">
-            <label className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
+            <label htmlFor={formId + "-field-9"} className="ui-field-label text-[10px] uppercase font-extrabold tracking-widest text-ui-muted">
               Notes
             </label>
-            <textarea
+            <textarea id={formId + "-field-9"}
               placeholder="Add your thoughts or quotes here..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={3}
               className="ui-field w-full px-4 py-3.5 rounded-2xl bg-ui-section border border-ui-border text-ui-text placeholder-ui-ink/40 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-base shadow-sm font-medium"
-              id="modal-note-textarea"
             />
           </div>
         </ValidatedForm>

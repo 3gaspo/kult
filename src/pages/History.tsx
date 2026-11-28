@@ -128,6 +128,7 @@ export const HistoryPage: React.FC = () => {
                 aria-label="Category" id="history-type-filter"
               >
                 <option value="all">All Categories</option>
+                {completedItems.some(item => !item.typeId) && <option value="">Uncategorized</option>}
                 {types.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.label}
